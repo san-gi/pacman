@@ -45,25 +45,25 @@
         var fruit = false;
         var fantome = new Object()
         fantome.blinky = new Object()
-        fantome.blinky.direction = "null";
+        fantome.blinky.direction = "gauche";
         fantome.blinky.vitesse = 0.6;
         fantome.blinky.x = 14;
         fantome.blinky.y = 10.5;
         fantome.blinky.couleur = "000000";
         fantome.pinky = new Object();
-        fantome.pinky.direction = "null";
+        fantome.pinky.direction = "gauche";
         fantome.pinky.vitesse = 0.6;
         fantome.pinky.x = 14;
         fantome.pinky.y = 10.5;
         fantome.pinky.couleur = "000000";
         fantome.inky = new Object();
-        fantome.inky.direction = "null";
+        fantome.inky.direction = "gauche";
         fantome.inky.vitesse = 0.6;
         fantome.inky.x = 12;
         fantome.inky.y = 10.5;
         fantome.inky.couleur = "000000";
         fantome.clyde = new Object();
-        fantome.clyde.direction = "null";
+        fantome.clyde.direction = "gauche";
         fantome.clyde.vitesse = 0.6;
         fantome.clyde.x = 16;
         fantome.clyde.y = 10.5;
@@ -293,7 +293,7 @@
             moveFantomes();
         }
         function choix(name) {
-  
+
             var cible = [];
             switch (name) {
                 case "blinky":
@@ -313,30 +313,44 @@
                     cible = [Math.floor(x / 10), Math.floor((y - HauteurPlateau) / 10 - 1)];
                     break;
             }
-            var max = 0;
-            var dir = "null"
-            var distanceD = Math.abs(Math.floor(fantome[name].x+1)-cible[0])+Math.abs(Math.floor(fantome[name].y)-cible[1]);
-            var distanceG = Math.abs(Math.floor(fantome[name].x-1)-cible[0])+Math.abs(Math.floor(fantome[name].y)-cible[1]);
-            var distanceH = Math.abs(Math.floor(fantome[name].x)-cible[0])+Math.abs(Math.floor(fantome[name].y-1)-cible[1]);
-            var distanceB = Math.abs(Math.floor(fantome[name].x)-cible[0])+Math.abs(Math.floor(fantome[name].y+1)-cible[1]);
-            if(distanceD>max&&fantome[name].direction!="droite"){
-                dir="droite";
-                max = distanceD
-            } 
-            if(distanceH>max&&fantome[name].direction!="haut"){
-                dir="haut";
-                max = distanceH;
-            }
-            if(distanceG>max&&fantome[name].direction!="haut"){
-                dir = "gauche";
-                max = distanceG;
-            }
-            if(distanceB>max&&fantome[name].direction!="bas"){
-                dir = "bas";
-                max = distanceB;
-            }
-            fantome[name].direction=dir;
+            var max = 200;
+            var dir = "nop"
+            var distanceD = Math.abs(Math.floor(fantome[name].x + 1) - cible[0]) + Math.abs(Math.floor(fantome[name].y) - cible[1]);
+            var distanceG = Math.abs(Math.floor(fantome[name].x - 1) - cible[0]) + Math.abs(Math.floor(fantome[name].y) - cible[1]);
+            var distanceH = Math.abs(Math.floor(fantome[name].x) - cible[0]) + Math.abs(Math.floor(fantome[name].y - 1) - cible[1]);
+            var distanceB = Math.abs(Math.floor(fantome[name].x) - cible[0]) + Math.abs(Math.floor(fantome[name].y + 1) - cible[1]);
+          
             
+
+                if (distanceD <= max && fantome[name].direction != "gauche" && tab[Math.floor(fantome[name].y - 0.40) + 1][Math.floor(fantome[name].x - 0.4) + 1] != "3") {
+      
+                    dir = "droite";
+                    max = distanceD
+                   
+                }
+                if (distanceH <= max && fantome[name].direction != "bas" && tab[Math.floor(fantome[f].y - 0.6) + 1][Math.floor(fantome[name].x - 0.4)] != "3") {
+
+                    dir = "haut";
+                    max = distanceH;
+           
+                }
+                if (distanceG <= max && fantome[name].direction != "droite" &&tab[Math.floor(fantome[name].y - 0.4) + 1][Math.floor(fantome[name].x - 0.6)] != "3") {
+                  
+                    dir = "gauche";
+                    max = distanceG;
+                   
+                }
+                if (distanceB <= max && fantome[name].direction != "haut" && tab[Math.floor(fantome[name].y - 0.4) + 2][Math.floor(fantome[name].x - 0.4)] != "3") {
+                  
+                    dir = "bas";
+                    max = distanceB;
+             
+                }
+
+                fantome[name].direction = dir;
+            
+
+
         }
         function moveFantomes() {
             for (f in fantome) {
@@ -346,25 +360,26 @@
                         choix(f);
                         break;
                     case "gauche":
-                        if (tab[Math.floor(fantome[f].y - 0.49) + 1][Math.floor(fantome[f].x - 0.51)] != "3")
+                        if (tab[Math.floor(fantome[f].y - 0.40) + 1][Math.floor(fantome[f].x - 0.6)] != "3")
                             fantome[f].x -= fantome[f].vitesse / 10;
                         else
                         choix(f);
                         break;
                     case "droite":
-                        if (tab[Math.floor(fantome[f].y - 0.49) + 1][Math.floor(fantome[f].x - 0.49) + 1] != "3")
+                        if (tab[Math.floor(fantome[f].y - 0.4) + 1][Math.floor(fantome[f].x - 0.4) + 1] != "3")
                             fantome[f].x += fantome[f].vitesse / 10;
                         else
                         choix(f);
+
                         break;
                     case "haut":
-                        if (tab[Math.floor(fantome[f].y - 0.51) + 1][Math.floor(fantome[f].x - 0.49)] != "3")
+                        if (tab[Math.floor(fantome[f].y - 0.60) + 1][Math.floor(fantome[f].x - 0.40)] != "3")
                             fantome[f].y -= fantome[f].vitesse / 10;
                         else
                         choix(f);
                         break;
                     case "bas":
-                        if (tab[Math.floor(fantome[f].y - 0.49) + 2][Math.floor(fantome[f].x - 0.49)] != "3")
+                        if (tab[Math.floor(fantome[f].y - 0.40) + 2][Math.floor(fantome[f].x - 0.40)] != "3")
                             fantome[f].y += fantome[f].vitesse / 10;
                         else
                         choix(f);

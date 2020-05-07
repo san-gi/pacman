@@ -1,186 +1,443 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8" />
     <title>Gamedev Canvas Workshop</title>
     <style>
-     * { padding: 0; margin: 0; }
-     canvas { background: black; display: block; margin: 0 auto; }
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        canvas {
+            background: black;
+            display: block;
+            margin: 0 auto;
+        }
     </style>
 </head>
+
 <body>
 
-<canvas id="myCanvas" width="480" height="320"></canvas>
+    <canvas id="Game" width="280" height="450"></canvas>
 
-<script>
-    var canvas = document.getElementById("myCanvas");
-    var ctx = canvas.getContext("2d");
-    var ballRadius = 10;
-    var x = canvas.width/2;
-    var y = canvas.height-30;
-    var dx = 2;
-    var dy = -2;
-    var paddleHeight = 10;
-    var paddleWidth = 75;
-    var paddleX = (canvas.width-paddleWidth)/2;
-    var rightPressed = false;
-    var leftPressed = false;
-    var brickRowCount = 5;
-    var brickColumnCount = 3;
-    var brickWidth = 75;
-    var brickHeight = 20;
-    var brickPadding = 10;
-    var brickOffsetTop = 30;
-    var brickOffsetLeft = 30;
-    var score = 0;
-    var lives = 3;
-    
-    var bricks = [];
-    for(var c=0; c<brickColumnCount; c++) {
-      bricks[c] = [];
-      for(var r=0; r<brickRowCount; r++) {
-        bricks[c][r] = { x: 0, y: 0, status: 1 };
-      }
-    }
-    
-    document.addEventListener("keydown", keyDownHandler, false);
-    document.addEventListener("keyup", keyUpHandler, false);
-    document.addEventListener("mousemove", mouseMoveHandler, false);
-    
-    function keyDownHandler(e) {
-        if(e.key == "Right" || e.key == "ArrowRight") {
-            rightPressed = true;
-        }
-        else if(e.key == "Left" || e.key == "ArrowLeft") {
-            leftPressed = true;
-        }
-    }
-    
-    function keyUpHandler(e) {
-        if(e.key == "Right" || e.key == "ArrowRight") {
-            rightPressed = false;
-        }
-        else if(e.key == "Left" || e.key == "ArrowLeft") {
-            leftPressed = false;
-        }
-    }
-    
-    function mouseMoveHandler(e) {
-      var relativeX = e.clientX - canvas.offsetLeft;
-      if(relativeX > 0 && relativeX < canvas.width) {
-        paddleX = relativeX - paddleWidth/2;
-      }
-    }
-    function collisionDetection() {
-      for(var c=0; c<brickColumnCount; c++) {
-        for(var r=0; r<brickRowCount; r++) {
-          var b = bricks[c][r];
-          if(b.status == 1) {
-            if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
-              dy = -dy;
-              b.status = 0;
-              score++;
-              if(score == brickRowCount*brickColumnCount) {
-                alert("YOU WIN, CONGRATS!");
-                document.location.reload();
-              }
+    <script>
+        var HauteurPlateau = 100;
+        var canvas = document.getElementById("Game");
+        var ctx = canvas.getContext("2d");
+        var x = 140;
+        var y = HauteurPlateau + 235;
+        var right = false;
+        var left = false;
+        var haut = false;
+        var bas = false;
+        var moveright = false;
+        var moveleft = false;
+        var movehaut = false;
+        var movebas = false;
+        var change = false;
+        var life = 4;
+        var score = 0;
+        var highscore = 0;
+        var ptsEat = 0;
+        var lvl = 0;
+        var fruit = false;
+        var fantome = new Object()
+        fantome.blinky = new Object()
+        fantome.blinky.direction = "null";
+        fantome.blinky.vitesse = 0.6;
+        fantome.blinky.x = 14;
+        fantome.blinky.y = 10.5;
+        fantome.blinky.couleur = "000000";
+        fantome.pinky = new Object();
+        fantome.pinky.direction = "null";
+        fantome.pinky.vitesse = 0.6;
+        fantome.pinky.x = 14;
+        fantome.pinky.y = 10.5;
+        fantome.pinky.couleur = "000000";
+        fantome.inky = new Object();
+        fantome.inky.direction = "null";
+        fantome.inky.vitesse = 0.6;
+        fantome.inky.x = 12;
+        fantome.inky.y = 10.5;
+        fantome.inky.couleur = "000000";
+        fantome.clyde = new Object();
+        fantome.clyde.direction = "null";
+        fantome.clyde.vitesse = 0.6;
+        fantome.clyde.x = 16;
+        fantome.clyde.y = 10.5;
+        fantome.clyde.couleur = "000000";
+
+
+        var l =
+            [["3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3"],
+            ["3", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "3"],
+            ["3", "1", "3", "3", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "3", "3", "1", "3"],
+            ["3", "2", "3", "0", "0", "3", "1", "3", "0", "0", "0", "3", "1", "3", "3", "1", "3", "0", "0", "0", "3", "1", "3", "0", "0", "3", "2", "3"],
+            ["3", "1", "3", "3", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "3", "3", "1", "3"],
+            ["3", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "3"],
+            ["3", "1", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "1", "3"],
+            ["3", "1", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "1", "3"],
+            ["3", "1", "1", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "1", "1", "3"],
+            ["3", "3", "3", "3", "3", "3", "1", "3", "3", "3", "3", "3", "0", "3", "3", "0", "3", "3", "3", "3", "3", "1", "3", "3", "3", "3", "3", "3"],
+            ["0", "0", "0", "0", "0", "3", "1", "3", "3", "3", "3", "3", "0", "3", "3", "0", "3", "3", "3", "3", "3", "1", "3", "0", "0", "0", "0", "0"],
+            ["0", "0", "0", "0", "0", "3", "1", "3", "3", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "3", "3", "1", "3", "0", "0", "0", "0", "0"],
+            ["0", "0", "0", "0", "0", "3", "1", "3", "3", "0", "3", "3", "3", "3", "3", "3", "3", "3", "0", "3", "3", "1", "3", "0", "0", "0", "0", "0"],
+            ["3", "3", "3", "3", "3", "3", "1", "3", "3", "0", "3", "0", "0", "0", "0", "0", "0", "3", "0", "3", "3", "1", "3", "3", "3", "3", "3", "3"],
+            ["0", "0", "0", "0", "0", "0", "1", "0", "0", "0", "3", "0", "0", "0", "0", "0", "0", "3", "0", "0", "0", "1", "0", "0", "0", "0", "0", "0"],
+            ["3", "3", "3", "3", "3", "3", "1", "3", "3", "0", "3", "0", "0", "0", "0", "0", "0", "3", "0", "3", "3", "1", "3", "3", "3", "3", "3", "3"],
+            ["0", "0", "0", "0", "0", "3", "1", "3", "3", "0", "3", "3", "3", "3", "3", "3", "3", "3", "0", "3", "3", "1", "3", "0", "0", "0", "0", "0"],
+            ["0", "0", "0", "0", "0", "3", "1", "3", "3", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "3", "3", "1", "3", "0", "0", "0", "0", "0"],
+            ["0", "0", "0", "0", "0", "3", "1", "3", "3", "0", "3", "3", "3", "3", "3", "3", "3", "3", "0", "3", "3", "1", "3", "0", "0", "0", "0", "0"],
+            ["3", "3", "3", "3", "3", "3", "1", "3", "3", "0", "3", "3", "3", "3", "3", "3", "3", "3", "0", "3", "3", "1", "3", "3", "3", "3", "3", "3"],
+            ["3", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "3"],
+            ["3", "1", "3", "3", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "3", "3", "1", "3"],
+            ["3", "1", "3", "3", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "3", "3", "1", "3"],
+            ["3", "2", "1", "1", "3", "3", "1", "1", "1", "1", "1", "1", "1", "0", "0", "1", "1", "1", "1", "1", "1", "1", "3", "3", "1", "1", "2", "3"],
+            ["3", "3", "3", "1", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "1", "3", "3", "3"],
+            ["3", "3", "3", "1", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "1", "3", "3", "3"],
+            ["3", "1", "1", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "1", "1", "3"],
+            ["3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3"],
+            ["3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3"],
+            ["3", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "3"],
+            ["3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3"]];
+        var tab = [["3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3"],
+        ["3", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "3"],
+        ["3", "1", "3", "3", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "3", "3", "1", "3"],
+        ["3", "2", "3", "0", "0", "3", "1", "3", "0", "0", "0", "3", "1", "3", "3", "1", "3", "0", "0", "0", "3", "1", "3", "0", "0", "3", "2", "3"],
+        ["3", "1", "3", "3", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "3", "3", "1", "3"],
+        ["3", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "3"],
+        ["3", "1", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "1", "3"],
+        ["3", "1", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "1", "3"],
+        ["3", "1", "1", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "1", "1", "3"],
+        ["3", "3", "3", "3", "3", "3", "1", "3", "3", "3", "3", "3", "0", "3", "3", "0", "3", "3", "3", "3", "3", "1", "3", "3", "3", "3", "3", "3"],
+        ["0", "0", "0", "0", "0", "3", "1", "3", "3", "3", "3", "3", "0", "3", "3", "0", "3", "3", "3", "3", "3", "1", "3", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "3", "1", "3", "3", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "3", "3", "1", "3", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "3", "1", "3", "3", "0", "3", "3", "3", "3", "3", "3", "3", "3", "0", "3", "3", "1", "3", "0", "0", "0", "0", "0"],
+        ["3", "3", "3", "3", "3", "3", "1", "3", "3", "0", "3", "0", "0", "0", "0", "0", "0", "3", "0", "3", "3", "1", "3", "3", "3", "3", "3", "3"],
+        ["0", "0", "0", "0", "0", "0", "1", "0", "0", "0", "3", "0", "0", "0", "0", "0", "0", "3", "0", "0", "0", "1", "0", "0", "0", "0", "0", "0"],
+        ["3", "3", "3", "3", "3", "3", "1", "3", "3", "0", "3", "0", "0", "0", "0", "0", "0", "3", "0", "3", "3", "1", "3", "3", "3", "3", "3", "3"],
+        ["0", "0", "0", "0", "0", "3", "1", "3", "3", "0", "3", "3", "3", "3", "3", "3", "3", "3", "0", "3", "3", "1", "3", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "3", "1", "3", "3", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "3", "3", "1", "3", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "3", "1", "3", "3", "0", "3", "3", "3", "3", "3", "3", "3", "3", "0", "3", "3", "1", "3", "0", "0", "0", "0", "0"],
+        ["3", "3", "3", "3", "3", "3", "1", "3", "3", "0", "3", "3", "3", "3", "3", "3", "3", "3", "0", "3", "3", "1", "3", "3", "3", "3", "3", "3"],
+        ["3", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "3"],
+        ["3", "1", "3", "3", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "3", "3", "1", "3"],
+        ["3", "1", "3", "3", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "1", "3", "3", "3", "3", "1", "3"],
+        ["3", "2", "1", "1", "3", "3", "1", "1", "1", "1", "1", "1", "1", "0", "0", "1", "1", "1", "1", "1", "1", "1", "3", "3", "1", "1", "2", "3"],
+        ["3", "3", "3", "1", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "1", "3", "3", "3"],
+        ["3", "3", "3", "1", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "1", "3", "3", "3"],
+        ["3", "1", "1", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "1", "1", "3"],
+        ["3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3"],
+        ["3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3", "3", "1", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "1", "3"],
+        ["3", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "3"],
+        ["3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3"]];
+        function drawPacman() {
+            if (right) if (l[Math.floor((Math.round(y) - HauteurPlateau) / 10)][Math.floor((Math.round(x) + 5) / 10)] != "3" && Math.round(y) % 10 == 5) {
+
+                x += 0.7;
+                movebas = false;
+                movehaut = false;
+                moveleft = false;
+                if (!moveright) {
+                    moveright = true;
+                    left = false;
+                    haut = false;
+                    bas = false;
+                }
             }
-          }
-        }
-      }
-    }
-    
-    function drawBall() {
-      ctx.beginPath();
-      ctx.arc(x, y, ballRadius, 0, Math.PI*2);
-      ctx.fillStyle = "#0095DD";
-      ctx.fill();
-      ctx.closePath();
-    }
-    function drawPaddle() {
-      ctx.beginPath();
-      ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
-      ctx.fillStyle = "#0095DD";
-      ctx.fill();
-      ctx.closePath();
-    }
-    function drawBricks() {
-      for(var c=0; c<brickColumnCount; c++) {
-        for(var r=0; r<brickRowCount; r++) {
-          if(bricks[c][r].status == 1) {
-            var brickX = (r*(brickWidth+brickPadding))+brickOffsetLeft;
-            var brickY = (c*(brickHeight+brickPadding))+brickOffsetTop;
-            bricks[c][r].x = brickX;
-            bricks[c][r].y = brickY;
+            if (left) if (l[Math.floor((Math.round(y) - HauteurPlateau) / 10)][Math.floor((Math.round(x) - 6) / 10)] != "3" && Math.round(y) % 10 == 5) {
+
+                x -= 0.7;
+                movebas = false;
+                movehaut = false;
+                moveright = false;
+                if (!moveleft) {
+                    moveleft = true;
+                    right = false;
+                    haut = false;
+                    bas = false;
+                }
+            }
+            if (haut) if (l[Math.floor((Math.round(y) - 6 - HauteurPlateau) / 10)][Math.floor(Math.round(x) / 10)] != "3" && Math.round(x) % 10 == 5) {
+
+                y -= 0.7;
+                movebas = false;
+                moveleft = false;
+                moveright = false;
+                if (!movehaut) {
+                    movehaut = true;
+                    right = false;
+                    left = false;
+                    bas = false;
+                }
+            }
+            if (bas) if (l[Math.floor((Math.round(y) + 5 - HauteurPlateau) / 10)][Math.floor(Math.round(x) / 10)] != "3" && Math.round(x) % 10 == 5) {
+
+                y += 0.7;
+                movehaut = false;
+                moveleft = false;
+                moveright = false;
+                if (!movebas) {
+                    movebas = true;
+                    right = false;
+                    left = false;
+                    haut = false;
+                }
+            }
+
+            if (x < 0)
+                x = 280;
+            if (x > 280)
+                x = 0;
+
+            if (l[Math.floor((Math.round(y) - HauteurPlateau) / 10)][Math.floor(Math.round(x) / 10)] == "1") {
+                score += 10;
+                ptsEat += 10;
+                console.log(ptsEat)
+                if (ptsEat == 700 || ptsEat == 1700)
+                    fruit = true;
+                if (ptsEat == 2600)
+                    nextLvl();
+                l[Math.floor((Math.round(y) - HauteurPlateau) / 10)][Math.floor(Math.round(x) / 10)] = "0";
+            }
+
+            if (l[Math.floor((Math.round(y) - HauteurPlateau) / 10)][Math.floor(Math.round(x) / 10)] == "2") {
+                score += 50;
+                ptsEat += 50;
+                console.log(ptsEat)
+                if (ptsEat == 700 || ptsEat == 1700)
+                    fruit = true;
+                console.log(ptsEat)
+                if (ptsEat == 2600)
+                    nextLvl();
+                l[Math.floor((y - HauteurPlateau) / 10)][Math.floor(x / 10)] = "0";
+            }
+            if (fruit && Math.round(y) == HauteurPlateau + 175 && Math.round(x) == 140) {
+                fruit = false;
+                score += 100;
+            }
+
             ctx.beginPath();
-            ctx.rect(brickX, brickY, brickWidth, brickHeight);
-            ctx.fillStyle = "#0095DD";
+            ctx.arc(x, y, 7, 0, Math.PI * 2);
+            ctx.fillStyle = "#FFFF00";
             ctx.fill();
             ctx.closePath();
-          }
         }
-      }
-    }
-    function drawScore() {
-      ctx.font = "16px Arial";
-      ctx.fillStyle = "#0095DD";
-      ctx.fillText("Score: "+score, 8, 20);
-    }
-    function drawLives() {
-      ctx.font = "16px Arial";
-      ctx.fillStyle = "#0095DD";
-      ctx.fillText("Lives: "+lives, canvas.width-65, 20);
-    }
-    
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawBricks();
-      drawBall();
-      drawPaddle();
-      drawScore();
-      drawLives();
-      collisionDetection();
-    
-      if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
-        dx = -dx;
-      }
-      if(y + dy < ballRadius) {
-        dy = -dy;
-      }
-      else if(y + dy > canvas.height-ballRadius) {
-        if(x > paddleX && x < paddleX + paddleWidth) {
-          dy = -dy;
+        function drawMap() {
+            for (var i = 0; i < 28; i++) {
+                for (var j = 0; j < 31; j++) {
+                    switch (l[j][i]) {
+                        case '0':
+                            break;
+                        case '1': ctx.beginPath();
+                            ctx.arc(i * 10 + 5, j * 10 + 5 + HauteurPlateau, 2, 0, Math.PI * 2);
+                            ctx.fillStyle = "#FFFF00";
+                            ctx.fill();
+                            ctx.closePath();
+                            break;
+                        case '2': ctx.beginPath();
+                            ctx.arc(i * 10 + 5, j * 10 + 5 + HauteurPlateau, 4, 0, Math.PI * 2);
+                            ctx.fillStyle = "#f6f6f6";
+                            ctx.fill();
+                            ctx.closePath();
+                            break;
+                        case '3': ctx.beginPath();
+                            ctx.rect(i * 10 + 2.5, j * 10 + 2.5 + HauteurPlateau, 5, 5); ctx.fillStyle = "#0002ff";
+                            ctx.fill();
+                            ctx.closePath();
+                            break;
+                    }
+
+                }
+            }
+
         }
-        else {
-          lives--;
-          if(!lives) {
-            alert("GAME OVER");
-            document.location.reload();
-          }
-          else {
-            x = canvas.width/2;
-            y = canvas.height-30;
-            dx = 3;
-            dy = -3;
-            paddleX = (canvas.width-paddleWidth)/2;
-          }
+        function drawinfo() {
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#FFFFFF";
+            ctx.textAlign = "center";
+            ctx.fillText(score, 50, HauteurPlateau - 10);
+            ctx.fillText(highscore, 280 / 2, HauteurPlateau - 30);
+            ctx.fillText("HIGH SCORE", 280 / 2, HauteurPlateau - 50);
         }
-      }
-    
-      if(rightPressed && paddleX < canvas.width-paddleWidth) {
-        paddleX += 7;
-      }
-      else if(leftPressed && paddleX > 0) {
-        paddleX -= 7;
-      }
-    
-      x += dx;
-      y += dy;
-      requestAnimationFrame(draw);
-    }
-    
-    draw();
-</script>
+
+        function nextLvl() {
+            console.log("nexttttttttttttt")
+            ptsEat = 0;
+            lvl += 1;
+            x = 140;
+            y = HauteurPlateau + 235;
+            haut = true;
+            right = false;
+            left = false;
+            bas = false;
+            movehaut = true;
+            moveright = false;
+            moveleft = false;
+            movebas = false;
+            for (var i = 0; i < 28; i++) {
+                for (var j = 0; j < 31; j++) {
+                    l[j][i] = tab[j][i];
+                }
+            }
+        }
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPacman();
+            drawMap();
+            drawinfo();
+            if (fruit)
+                drawFruit();
+            moveFantomes();
+        }
+        function choix(name) {
+  
+            var cible = [];
+            switch (name) {
+                case "blinky":
+                    cible = [Math.floor(x / 10), Math.floor((y - HauteurPlateau) / 10 - 1)];
+                    break;
+                case "pinky":
+                    cible = [Math.floor(x / 10), Math.floor((y - HauteurPlateau) / 10 - 1)];
+                    if (left) cible[0] -= 4;
+                    else if (right) cible[0] += 4;
+                    else if (haut) cible[1] -= 4;
+                    else if (bas) cible[1] += 4;
+                    break;
+                case "inky":
+                    cible = [Math.floor(x / 10), Math.floor((y - HauteurPlateau) / 10 - 1)];
+                    break;
+                case "clyde":
+                    cible = [Math.floor(x / 10), Math.floor((y - HauteurPlateau) / 10 - 1)];
+                    break;
+            }
+            var max = 200;
+            var dir = "null"
+            var distanceD = Math.abs(Math.floor(fantome[name].x+1)-cible[0])+Math.abs(Math.floor(fantome[name].y)-cible[1]);
+            var distanceG = Math.abs(Math.floor(fantome[name].x-1)-cible[0])+Math.abs(Math.floor(fantome[name].y)-cible[1]);
+            var distanceH = Math.abs(Math.floor(fantome[name].x)-cible[0])+Math.abs(Math.floor(fantome[name].y-1)-cible[1]);
+            var distanceB = Math.abs(Math.floor(fantome[name].x)-cible[0])+Math.abs(Math.floor(fantome[name].y+1)-cible[1]);
+            if(name == "blinky"){
+                console.log(distanceD,distanceG,distanceH,distanceB)
+                console.log(fantome[name].direction)
+            }
+
+
+            if(distanceD<=max&&fantome[name].direction!="gauche"){
+                console.log(" choix droit "+fantome[name].direction)
+                dir="droite";
+                max = distanceD
+            } 
+            if(distanceH<=max&&fantome[name].direction!="bas"){
+                console.log(" choix haut "+fantome[name].direction)
+                dir="haut";
+                max = distanceH;
+            }
+            if(distanceG<=max&&fantome[name].direction!="droite"){
+                console.log(" choix gauche "+fantome[name].direction)
+                dir = "gauche";
+                max = distanceG;
+            }
+            if(distanceB<=max&&fantome[name].direction!="haut"){
+                console.log(" choix bas "+fantome[name].direction)
+                dir = "bas";
+                max = distanceB;
+            }
+            console.log("dir ="+ dir)
+            fantome[name].direction=dir;
+        }
+            
+        }
+        function moveFantomes() {
+            for (f in fantome) {
+
+                switch (fantome[f].direction) {
+                    
+                    case "null":
+                       // choix(f);
+                        break;
+                    case "gauche":
+                    console.log("gauche");
+                        if (tab[Math.floor(fantome[f].y - 0.49) + 1][Math.floor(fantome[f].x - 0.51)] != "3")
+                            fantome[f].x -= fantome[f].vitesse / 10;
+                        else
+                        //choix(f);
+                        break;
+                    case "droite":
+                    console.log("droite");
+                        if (tab[Math.floor(fantome[f].y - 0.49) + 1][Math.floor(fantome[f].x - 0.49) + 1] != "3")
+                            fantome[f].x += fantome[f].vitesse / 10;
+                        else
+                        //choix(f);
+                        break;
+                    case "haut":
+                    console.log("haut");
+                        if (tab[Math.floor(fantome[f].y - 0.51) + 1][Math.floor(fantome[f].x - 0.49)] != "3")
+                            fantome[f].y -= fantome[f].vitesse / 10;
+                        else
+                        //choix(f);
+                        break;
+                    case "bas":
+                    console.log("bas");
+                        if (tab[Math.floor(fantome[f].y - 0.49) + 2][Math.floor(fantome[f].x - 0.49)] != "3")
+                            fantome[f].y += fantome[f].vitesse / 10;
+                        else
+                        //choix(f);
+                        break;
+                }
+            }
+
+            drawFantome("#FF0000", fantome.blinky.x * 10, fantome.blinky.y * 10 + HauteurPlateau / 10)
+            drawFantome("#FF00FF", fantome.pinky.x * 10, fantome.pinky.y * 10 + HauteurPlateau / 10)
+            drawFantome("#00FFFF", fantome.inky.x * 10, fantome.inky.y * 10 + HauteurPlateau / 10)
+            drawFantome("#FF9900", fantome.clyde.x * 10, fantome.clyde.y * 10 + HauteurPlateau / 10)
+            if (Math.round(y / 10) == Math.round(fantome.blinky.y)) {
+                console.log("coliision")
+            }
+        }
+        function drawFantome(couleur, x, y) {
+            ctx.beginPath();
+            ctx.arc(x, HauteurPlateau + y, 7, 0, Math.PI * 2);
+            ctx.fillStyle = couleur;
+            ctx.fill();
+            ctx.closePath();
+
+        }
+        function drawFruit() {
+            ctx.beginPath();
+            ctx.arc(140, HauteurPlateau + 175, 7, 0, Math.PI * 2);
+            ctx.fillStyle = "#cd5757";
+            ctx.fill();
+            ctx.closePath();
+        }
+        document.addEventListener("keydown", keyDownHandler, false);
+        function keyDownHandler(e) {
+            if (e.key == "d") {
+                right = true;
+                if (left)
+                    left = false;
+            }
+            else if (e.key == "q" || e.key == "a") {
+                left = true;
+                if (right)
+                    right = false;
+            }
+            else if (e.key == "z" || e.key == "w") {
+                haut = true;
+                if (bas)
+                    bas = false;
+            }
+            else if (e.key == "s") {
+                bas = true;
+                if (haut)
+                    haut = false;
+            }
+        }
+        setInterval(draw, 10);
+    </script>
 
 </body>
+
 </html>
