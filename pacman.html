@@ -42,6 +42,25 @@
         var highscore = 0;
         var ptsEat = 0;
         var lvl = 0;
+        var fruit = false;
+        var fantomes = {
+            blinky = {
+                x = 0,
+                y=0
+            },
+            pinky = {
+                x = 0,
+                y=0
+            },
+            inky = {
+                x = 0,
+                y=0
+            },
+            clyde = {
+                x = 0,
+                y=0
+            },
+        }
         var l =
             [["3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3"],
             ["3", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "3", "3", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "3"],
@@ -169,7 +188,7 @@
                 ptsEat += 10;
                 console.log(ptsEat)
                 if (ptsEat == 700 || ptsEat == 1700)
-                    fruit();
+                    fruit = true;
                 if (ptsEat == 2600)
                     nextLvl();
                 l[Math.floor((y - HauteurPlateau) / 10)][Math.floor(x / 10)] = "0";
@@ -180,13 +199,17 @@
                 ptsEat += 50;
                 console.log(ptsEat)
                 if (ptsEat == 700 || ptsEat == 1700)
-                    fruit();
+                    fruit = true;
                 console.log(ptsEat)
                 if (ptsEat == 2600)
                     nextLvl();
                 l[Math.floor((y - HauteurPlateau) / 10)][Math.floor(x / 10)] = "0";
             }
-
+            if (fruit && y == HauteurPlateau + 175 && x == 140){
+                fruit = false;
+                score+=100;
+            }
+                
             ctx.beginPath();
             ctx.arc(x, y, 7, 0, Math.PI * 2);
             ctx.fillStyle = "#FFFF00";
@@ -230,9 +253,7 @@
             ctx.fillText(highscore, 280 / 2, HauteurPlateau - 30);
             ctx.fillText("HIGH SCORE", 280 / 2, HauteurPlateau - 50);
         }
-        function fruit() {
-            console.log("fruit aaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-        }
+
         function nextLvl() {
             console.log("nexttttttttttttt")
             ptsEat = 0;
@@ -252,17 +273,23 @@
                     l[j][i] = tab[j][i];
                 }
             }
-
-
         }
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawPacman();
             drawMap();
             drawinfo();
+            if(fruit)
+                drawFruit();
+        }
+        function drawFruit() {
+            ctx.beginPath();
+            ctx.arc(140, HauteurPlateau+175, 7, 0, Math.PI * 2);
+            ctx.fillStyle = "#cd5757";
+            ctx.fill();
+            ctx.closePath();
         }
         document.addEventListener("keydown", keyDownHandler, false);
-
         function keyDownHandler(e) {
             if (e.key == "d") {
                 right = true;
