@@ -68,7 +68,7 @@
         fantome.clyde = new Object();
         fantome.clyde.direction = "gauche";
         fantome.clyde.vitesse = 0.6;
-        fantome.clyde.x = 120;
+        fantome.clyde.x = 160;
         fantome.clyde.y = 115;
         fantome.clyde.choix = false;
         fantome.clyde.couleur = "000000";
@@ -142,7 +142,7 @@
         function drawPacman() {
             if (right) if (l[Math.floor((Math.round(y) - HauteurPlateau) / 10)][Math.floor((Math.round(x) + 5) / 10)] != "3" && Math.round(y) % 10 == 5) {
 
-                x += 0.7;
+                x += 1;
                 movebas = false;
                 movehaut = false;
                 moveleft = false;
@@ -155,7 +155,7 @@
             }
             if (left) if (l[Math.floor((Math.round(y) - HauteurPlateau) / 10)][Math.floor((Math.round(x) - 6) / 10)] != "3" && Math.round(y) % 10 == 5) {
 
-                x -= 0.7;
+                x -= 1;
                 movebas = false;
                 movehaut = false;
                 moveright = false;
@@ -168,7 +168,7 @@
             }
             if (haut) if (l[Math.floor((Math.round(y) - 6 - HauteurPlateau) / 10)][Math.floor(Math.round(x) / 10)] != "3" && Math.round(x) % 10 == 5) {
 
-                y -= 0.7;
+                y -= 1;
                 movebas = false;
                 moveleft = false;
                 moveright = false;
@@ -181,7 +181,7 @@
             }
             if (bas) if (l[Math.floor((Math.round(y) + 5 - HauteurPlateau) / 10)][Math.floor(Math.round(x) / 10)] != "3" && Math.round(x) % 10 == 5) {
 
-                y += 0.7;
+                y += 1;
                 movehaut = false;
                 moveleft = false;
                 moveright = false;
@@ -316,8 +316,8 @@
         }
         function choix(name) {
             if (name == "blinky")
-                console.log("choix")
-            var cible = [];
+
+                var cible = [];
             switch (name) {
                 case "blinky":
                     cible = [x, y - HauteurPlateau];
@@ -337,8 +337,8 @@
                     else if (movehaut) cible[1] -= 20;
                     else if (movebas) cible[1] += 20;
                     //console.log(cible[0],cible[1])
-                    cible[0] += ( Math.floor(cible[0]-fantome.blinky.x))
-                    cible[1] += ( Math.floor(cible[1])-fantome.blinky.y)
+                    cible[0] += (Math.floor(cible[0] - fantome.blinky.x))
+                    cible[1] += (Math.floor(cible[1]) - fantome.blinky.y)
                     //console.log(cible[0],cible[1])
                     break;
                 case "clyde":
@@ -445,10 +445,33 @@
                 fantome.clyde.x = 280;
             if (fantome.clyde.x > 280)
                 fantome.clyde.x = 0;
-            drawFantome("#FF9900", fantome.clyde.x, fantome.clyde.y)
-            if (Math.round(y / 10) == Math.round(fantome.blinky.y)) {
-                console.log("coliision")
-            }
+            drawFantome("#FF9900", Math.round((y - 100) / 10), Math.round((fantome.blinky.y) / 10))
+
+            if (Math.round((y - 100) / 10) == Math.round((fantome.blinky.y) / 10) && Math.round((x) / 10) == Math.round((fantome.blinky.x) / 10))
+                repositionne()
+            if (Math.round((y - 100) / 10) == Math.round((fantome.pinky.y) / 10) && Math.round((x) / 10) == Math.round((fantome.pinky.x) / 10))
+                repositionne()
+            if (Math.round((y - 100) / 10) == Math.round((fantome.inky.y) / 10) && Math.round((x) / 10) == Math.round((fantome.inky.x) / 10))
+                repositionne()
+            if (Math.round((y - 100) / 10) == Math.round((fantome.clyde.y) / 10) && Math.round((x) / 10) == Math.round((fantome.clyde.x) / 10))
+                repositionne()
+
+        }
+        function repositionne() {
+            console.log("coliision")
+            x = 140;
+            y = HauteurPlateau + 235;
+            life--;
+            left = false; right = false; haut = false, bas = false, moveleft = false; moveright = false; movehaut = false, movebas = false
+            if (life == 0)
+                GameOver();
+        }
+        function GameOver() {
+            console.log("GameOver")
+            restart();
+        }
+        function restart() {
+
         }
         function drawFantome(couleur, x, y) {
             ctx.beginPath();
