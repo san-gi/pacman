@@ -44,13 +44,16 @@
         var movehaut = false;
         var movebas = false;
         var change = false;
-        var life = 4;
+        var life = 5;
         var score = 0;
         var highscore = 0;
         var ptsEat = 0;
-        var lvl = 0;
+        var lvl = 1;
         var fruit = false;
         var mode = "chasse"
+        var up = false;
+        var FantomeBleu = false;
+        var fantomeEat = 200;
         var fantome = new Object()
         fantome.blinky = new Object()
         fantome.blinky.direction = "gauche";
@@ -153,7 +156,7 @@
         function drawPacman() {
             if (right) if (l[Math.floor((Math.round(y) - HauteurPlateau) / 10)][Math.floor((Math.round(x) + 5) / 10)] != "3" && Math.round(y) % 10 == 5) {
 
-                x += 1;
+                x += 0.8;
                 movebas = false;
                 movehaut = false;
                 moveleft = false;
@@ -166,7 +169,7 @@
             }
             if (left) if (l[Math.floor((Math.round(y) - HauteurPlateau) / 10)][Math.floor((Math.round(x) - 6) / 10)] != "3" && Math.round(y) % 10 == 5) {
 
-                x -= 1;
+                x -= 0.8;
                 movebas = false;
                 movehaut = false;
                 moveright = false;
@@ -179,7 +182,7 @@
             }
             if (haut) if (l[Math.floor((Math.round(y) - 6 - HauteurPlateau) / 10)][Math.floor(Math.round(x) / 10)] != "3" && Math.round(x) % 10 == 5) {
 
-                y -= 1;
+                y -= 0.8;
                 movebas = false;
                 moveleft = false;
                 moveright = false;
@@ -192,7 +195,7 @@
             }
             if (bas) if (l[Math.floor((Math.round(y) + 5 - HauteurPlateau) / 10)][Math.floor(Math.round(x) / 10)] != "3" && Math.round(x) % 10 == 5) {
 
-                y += 1;
+                y += 0.8;
                 movehaut = false;
                 moveleft = false;
                 moveright = false;
@@ -228,6 +231,8 @@
                     fantome.clyde.x = 140;
                     fantome.clyde.y = 115;
                 }
+                if (score > 10000 && !up)
+                    life++;
             }
             if (l[Math.floor((Math.round(y) - HauteurPlateau) / 10)][Math.floor(Math.round(x) / 10)] == "1") {
                 eat(10)
@@ -240,6 +245,7 @@
 
             if (l[Math.floor((Math.round(y) - HauteurPlateau) / 10)][Math.floor(Math.round(x) / 10)] == "2") {
                 eat(50)
+                bleu();
                 l[Math.floor((y - HauteurPlateau) / 10)][Math.floor(x / 10)] = "0";
             }
             if (fruit && Math.round(y) == HauteurPlateau + 175 && Math.round(x) == 140) {
@@ -442,40 +448,36 @@
                             choix(f);
                         break;
                 }
+                if (fantome[f].x < 0)
+                    fantome[f].x = 280;
+                if (fantome[f].x > 280)
+                    fantome[f].x = 0;
+                if (Math.floor((y - 100) / 10) == Math.floor(fantome[f].y / 10) && Math.floor(x / 10) == Math.floor(fantome[f].x / 10))
+                    if (!FantomeBleu)
+                        repositionne()
+                    else {
+                        fantome[f].x = 140;
+                        fantome[f].y = 145;
+                        score+=fantomeEat;
+                        fantomeEat= fantomeEat*2
+                        var r = f;
+                        var manger = setTimeout(function () {
+                            fantome[r].x = 140;
+                            fantome[r].y = 115;                       
+                            fantomeEat=200;
+                        }, 5000);
+                    }
             }
-            if (fantome.blinky.x < 0)
-                fantome.blinky.x = 280;
-            if (fantome.blinky.x > 280)
-                fantome.blinky.x = 0;
             drawFantome("#FF0000", fantome.blinky.x, fantome.blinky.y)
-            if (fantome.pinky.x < 0)
-                fantome.pinky.x = 280;
-            if (fantome.pinky.x > 280)
-                fantome.pinky.x = 0;
             drawFantome("#FF00FF", fantome.pinky.x, fantome.pinky.y)
-            if (fantome.inky.x < 0)
-                fantome.inky.x = 280;
-            if (fantome.inky.x > 280)
-                fantome.inky.x = 0;
             drawFantome("#00FFFF", fantome.inky.x, fantome.inky.y)
-            if (fantome.clyde.x < 0)
-                fantome.clyde.x = 280;
-            if (fantome.clyde.x > 280)
-                fantome.clyde.x = 0;
             drawFantome("#FF9900", fantome.clyde.x, fantome.clyde.y)
 
-            if (Math.floor((y - 100) / 10) == Math.floor(fantome.blinky.y / 10) && Math.floor(x / 10) == Math.floor(fantome.blinky.x / 10))
-                repositionne()
-            if (Math.floor((y - 100) / 10) == Math.floor(fantome.pinky.y / 10) && Math.floor(x / 10) == Math.floor(fantome.pinky.x / 10))
-                repositionne()
-            if (Math.floor((y - 100) / 10) == Math.floor(fantome.inky.y / 10) && Math.floor(x / 10) == Math.floor(fantome.inky.x / 10))
-                repositionne()
-            if (Math.floor((y - 100) / 10) == Math.floor(fantome.clyde.y / 10) && Math.floor(x / 10) == Math.floor(fantome.clyde.x / 10))
-                repositionne()
+
 
         }
         function repositionne() {
-            
+
             fantome.blinky.x = 140;
             fantome.blinky.y = 115;
             fantome.blinky.direction = "gauche";
@@ -484,12 +486,12 @@
             fantome.pinky.direction = "gauche";
             fantome.inky.x = 120;
             fantome.inky.y = 145;
-            fantome.inky.sortie=false;
+            fantome.inky.sortie = false;
             fantome.inky.direction = "gauche";
             fantome.clyde.x = 160;
             fantome.clyde.y = 145;
             fantome.clyde.direction = "gauche";
-            console.log("coliision")
+
             x = 140;
             y = HauteurPlateau + 235;
             life--;
@@ -502,13 +504,13 @@
                 var SortieInky = setTimeout(function () {
                     fantome.inky.x = 140;
                     fantome.inky.y = 115;
-                    fantome.inky.sortie=true;
+                    fantome.inky.sortie = true;
                 }, 3000);
-                if (ptsEat > 870)
+            if (ptsEat > 870)
                 var SortieInky = setTimeout(function () {
                     fantome.clyde.x = 140;
                     fantome.clyde.y = 115;
-                    fantome.clyde.sortie=true;
+                    fantome.clyde.sortie = true;
                 }, 4500);
             if (life == 0)
                 GameOver();
@@ -526,10 +528,37 @@
         function drawFantome(couleur, x, y) {
             ctx.beginPath();
             ctx.arc(x, HauteurPlateau + y, 7, 0, Math.PI * 2);
-            ctx.fillStyle = couleur;
+            if (!FantomeBleu)
+                ctx.fillStyle = couleur;
+            else
+                ctx.fillStyle = "#0000ff";
             ctx.fill();
             ctx.closePath();
 
+        }
+        function bleu() {
+            for (f in fantome) {
+                if (fantome[f].direction == "gauche")
+                    fantome[f].direction = "droite"
+                else if (fantome[f].direction == "droite")
+                    fantome[f].direction = "gauche"
+                else if (fantome[f].direction == "haut")
+                    fantome[f].direction = "bas"
+                else if (fantome[f].direction == "bas")
+                    fantome[f].direction = "haut"
+                fantome[f].vitesse=0.3;
+            }
+            console.log("bleuuuuuuuuuuuuuuuuuuuuuuuuuuu")
+            FantomeBleu = true;
+            console.log(FantomeBleu)
+            mode = "scatter"
+
+            var FBleu = setTimeout(function () {
+                FantomeBleu = false;
+                mode = "chasse"
+                for (e in fantome) 
+                fantome[e].vitesse=0.6;
+            }, 5000);
         }
         function drawFruit() {
             ctx.beginPath();
