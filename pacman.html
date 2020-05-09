@@ -224,8 +224,11 @@
                 console.log(ptsEat)
                 if (ptsEat == 700 || ptsEat == 1700)
                     fruit = true;
-                if (ptsEat == 2600)
+                if (ptsEat == 2600){
+                    repositionne()
                     nextLvl();
+                }
+                    
                 if (score > highscore)
                     highscore = score;
                 if (ptsEat >= 300 && !fantome.inky.sortie) {
@@ -315,7 +318,7 @@
         }
 
         function nextLvl() {
-            repositionne()
+            
             time = 0;
             mode = "scatter"
             console.log("nexttttttttttttt")
@@ -352,7 +355,7 @@
             moveFantomes();
             if (score > 10000 && !up) {
                 life++;
-                life = false;
+                up = true;
             }
             requestAnimationFrame(draw);
         }
