@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Gamedev Canvas Workshop</title>
+    <title>Pac Man !</title>
     <style>
         * {
             padding: 0;
@@ -25,10 +25,16 @@
     <script>
 
         /**todo
-        *   reposition des mob
         *   tableau de score
-        *   changement de vitesse par lvl, et pts du fruit
-        *   alternance des mods
+        *   Pause
+        *   Tableau de début de jeu
+        *   petite pause entre les lvl ou en perte de vie
+        *   le déplacement des mob vers et en dehors de leurs zone de départ
+        *   modificiation de la viteese selon le niveau,et des durée des mode scatter et chasse
+        *   surement d'autres trucs
+        *   pause du timer durant la phase de fantome bleu
+        * ralentissement des fantomes dans le tunnel
+        *   
         */
         var HauteurPlateau = 100;
         var canvas = document.getElementById("Game");
@@ -50,14 +56,15 @@
         var ptsEat = 0;
         var lvl = 1;
         var fruit = false;
-        var mode = "chasse"
+        var mode = "scatter"
         var up = false;
         var FantomeBleu = false;
         var fantomeEat = 200;
         var fantome = new Object()
+        var time = 0;
         fantome.blinky = new Object()
         fantome.blinky.direction = "gauche";
-        fantome.blinky.vitesse = 0.6;
+        fantome.blinky.vitesse = 1;
         fantome.blinky.x = 140;
         fantome.blinky.y = 115;
         fantome.blinky.choix = false;
@@ -65,14 +72,14 @@
         fantome.blinky.dark = false;
         fantome.pinky = new Object();
         fantome.pinky.direction = "gauche";
-        fantome.pinky.vitesse = 0.6;
+        fantome.pinky.vitesse = 1;
         fantome.pinky.x = 140;
         fantome.pinky.y = 145;
         fantome.pinky.choix = false;
         fantome.pinky.couleur = "000000";
         fantome.inky = new Object();
         fantome.inky.direction = "gauche";
-        fantome.inky.vitesse = 0.6;
+        fantome.inky.vitesse = 1;
         fantome.inky.x = 120;
         fantome.inky.y = 145;
         fantome.inky.choix = false;
@@ -80,7 +87,7 @@
         fantome.inky.sortie = false;
         fantome.clyde = new Object();
         fantome.clyde.direction = "gauche";
-        fantome.clyde.vitesse = 0.6;
+        fantome.clyde.vitesse = 1;
         fantome.clyde.x = 160;
         fantome.clyde.y = 145;
         fantome.clyde.choix = false;
@@ -156,7 +163,7 @@
         function drawPacman() {
             if (right) if (l[Math.floor((Math.round(y) - HauteurPlateau) / 10)][Math.floor((Math.round(x) + 5) / 10)] != "3" && Math.round(y) % 10 == 5) {
 
-                x += 0.8;
+                x += 1.25;
                 movebas = false;
                 movehaut = false;
                 moveleft = false;
@@ -169,7 +176,7 @@
             }
             if (left) if (l[Math.floor((Math.round(y) - HauteurPlateau) / 10)][Math.floor((Math.round(x) - 6) / 10)] != "3" && Math.round(y) % 10 == 5) {
 
-                x -= 0.8;
+                x -= 1.25;
                 movebas = false;
                 movehaut = false;
                 moveright = false;
@@ -182,7 +189,7 @@
             }
             if (haut) if (l[Math.floor((Math.round(y) - 6 - HauteurPlateau) / 10)][Math.floor(Math.round(x) / 10)] != "3" && Math.round(x) % 10 == 5) {
 
-                y -= 0.8;
+                y -= 1.25;
                 movebas = false;
                 moveleft = false;
                 moveright = false;
@@ -195,7 +202,7 @@
             }
             if (bas) if (l[Math.floor((Math.round(y) + 5 - HauteurPlateau) / 10)][Math.floor(Math.round(x) / 10)] != "3" && Math.round(x) % 10 == 5) {
 
-                y += 0.8;
+                y += 1.25;
                 movehaut = false;
                 moveleft = false;
                 moveright = false;
@@ -223,16 +230,18 @@
                     highscore = score;
                 if (ptsEat >= 300 && !fantome.inky.sortie) {
                     fantome.inky.sortie = true;
+                    fantome.inky.direction = "gauche";
                     fantome.inky.x = 140;
                     fantome.inky.y = 115;
                 }
                 if (ptsEat >= 866 && !fantome.clyde.sortie) {
+                    fantome.clyde.direction = "gauche";
                     fantome.clyde.sortie = true;
                     fantome.clyde.x = 140;
                     fantome.clyde.y = 115;
                 }
-                if (score > 10000 && !up)
-                    life++;
+
+
             }
             if (l[Math.floor((Math.round(y) - HauteurPlateau) / 10)][Math.floor(Math.round(x) / 10)] == "1") {
                 eat(10)
@@ -306,6 +315,8 @@
         }
 
         function nextLvl() {
+            time = 0;
+            mode = "scatter"
             console.log("nexttttttttttttt")
             ptsEat = 0;
             lvl += 1;
@@ -326,6 +337,11 @@
             }
         }
         function draw() {
+            if (!FantomeBleu) {
+                time++;
+                tempo(time);
+            }
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawPacman();
             drawMap();
@@ -333,6 +349,51 @@
             if (fruit)
                 drawFruit();
             moveFantomes();
+            if (score > 10000 && !up) {
+                life++;
+                life = false;
+            }
+            requestAnimationFrame(draw);
+        }
+        function tempo(t) {
+
+            if (t == 700) {
+                mode = "chasse";
+                inverseDir();
+            }
+
+
+            else if (t == 2700) {
+                mode = "scatter";
+                inverseDir();
+            }
+
+            else if (t == 3400) {
+                mode = "chasse";
+                inverseDir();
+            }
+
+            else if (t == 5400) {
+                mode = "scatter";
+                inverseDir();
+            }
+
+            else if (t == 5900) {
+                mode = "chasse";
+                inverseDir();
+            }
+
+            else if (t == 7900) {
+                mode = "scatter";
+                inverseDir();
+            }
+
+            else if (t >= 8400) {
+                mode = "chasse";
+                inverseDir();
+            }
+
+
         }
         function choix(name) {
             if (!fantome[name].choix) {
@@ -453,18 +514,22 @@
                 if (fantome[f].x > 280)
                     fantome[f].x = 0;
                 if (Math.floor((y - 100) / 10) == Math.floor(fantome[f].y / 10) && Math.floor(x / 10) == Math.floor(fantome[f].x / 10))
-                    if (!FantomeBleu)
+                    if (!FantomeBleu) {
+                        mode = "scatter"
                         repositionne()
+                        time = 0;
+                    }
+
                     else {
                         fantome[f].x = 140;
                         fantome[f].y = 145;
-                        score+=fantomeEat;
-                        fantomeEat= fantomeEat*2
+                        score += fantomeEat;
+                        fantomeEat = fantomeEat * 2
                         var r = f;
                         var manger = setTimeout(function () {
                             fantome[r].x = 140;
-                            fantome[r].y = 115;                       
-                            fantomeEat=200;
+                            fantome[r].y = 115;
+                            fantomeEat = 200;
                         }, 5000);
                     }
             }
@@ -499,18 +564,22 @@
             var SortiePinky = setTimeout(function () {
                 fantome.pinky.x = 140;
                 fantome.pinky.y = 115;
+                fantome.pinky.direction = "gauche";
+
             }, 1500);
             if (ptsEat >= 300)
                 var SortieInky = setTimeout(function () {
                     fantome.inky.x = 140;
                     fantome.inky.y = 115;
                     fantome.inky.sortie = true;
+                    fantome.inky.direction = "gauche";
                 }, 3000);
             if (ptsEat > 870)
                 var SortieInky = setTimeout(function () {
                     fantome.clyde.x = 140;
                     fantome.clyde.y = 115;
                     fantome.clyde.sortie = true;
+                    fantome.clyde.direction = "gauche";
                 }, 4500);
             if (life == 0)
                 GameOver();
@@ -519,7 +588,7 @@
             console.log("GameOver")
             score = 0
             life = 4;
-            lvl = -1;
+            lvl = 0;
             nextLvl()
         }
         function restart() {
@@ -536,7 +605,7 @@
             ctx.closePath();
 
         }
-        function bleu() {
+        function inverseDir() {
             for (f in fantome) {
                 if (fantome[f].direction == "gauche")
                     fantome[f].direction = "droite"
@@ -546,8 +615,12 @@
                     fantome[f].direction = "bas"
                 else if (fantome[f].direction == "bas")
                     fantome[f].direction = "haut"
-                fantome[f].vitesse=0.3;
+
             }
+        }
+        function bleu() {
+            for (f in fantome) 
+            fantome[f].vitesse = 0.5;
             console.log("bleuuuuuuuuuuuuuuuuuuuuuuuuuuu")
             FantomeBleu = true;
             console.log(FantomeBleu)
@@ -555,9 +628,8 @@
 
             var FBleu = setTimeout(function () {
                 FantomeBleu = false;
-                mode = "chasse"
-                for (e in fantome) 
-                fantome[e].vitesse=0.6;
+                for (e in fantome)
+                    fantome[e].vitesse = 1;
             }, 5000);
         }
         function drawFruit() {
@@ -590,7 +662,8 @@
                     haut = false;
             }
         }
-        setInterval(draw, 10);
+        draw()
+
         repositionne()
     </script>
 
