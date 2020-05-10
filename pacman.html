@@ -358,42 +358,41 @@
                 up = true;
                 
             }
-            requestAnimationFrame(draw);
         }
         function tempo(t) {
 
-            if (t == 700) {
+            if (t == 360) {
                 mode = "chasse";
                 inverseDir();
             }
 
+
+            else if (t == 1360) {
+                mode = "scatter";
+                inverseDir();
+            }
+
+            else if (t == 1700) {
+                mode = "chasse";
+                inverseDir();
+            }
 
             else if (t == 2700) {
                 mode = "scatter";
                 inverseDir();
             }
 
-            else if (t == 3400) {
+            else if (t == 2960) {
                 mode = "chasse";
                 inverseDir();
             }
 
-            else if (t == 5400) {
+            else if (t == 3960) {
                 mode = "scatter";
                 inverseDir();
             }
 
-            else if (t == 5900) {
-                mode = "chasse";
-                inverseDir();
-            }
-
-            else if (t == 7900) {
-                mode = "scatter";
-                inverseDir();
-            }
-
-            else if (t >= 8400) {
+            else if (t >= 4200) {
                 mode = "chasse";
                 inverseDir();
             }
@@ -667,7 +666,7 @@
                     haut = false;
             }
         }
-        draw()
+        setInterval(function(){draw() }, 20);
 
         repositionne()
     </script>
