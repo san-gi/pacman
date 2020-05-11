@@ -50,7 +50,7 @@
         var movehaut = false;
         var movebas = false;
         var change = false;
-        var life = 5;
+        var life = 4;
         var score = 0;
         var highscore = 0;
         var ptsEat = 0;
@@ -224,11 +224,11 @@
                 console.log(ptsEat)
                 if (ptsEat == 700 || ptsEat == 1700)
                     fruit = true;
-                if (ptsEat == 2600){
+                if (ptsEat == 2600) {
                     repositionne()
                     nextLvl();
                 }
-                    
+
                 if (score > highscore)
                     highscore = score;
                 if (ptsEat >= 300 && !fantome.inky.sortie) {
@@ -318,7 +318,6 @@
         }
 
         function nextLvl() {
-            life++;
             time = 0;
             mode = "scatter"
             console.log("nexttttttttttttt")
@@ -356,7 +355,7 @@
             if (score > 10000 && !up) {
                 life++;
                 up = true;
-                
+
             }
         }
         function tempo(t) {
@@ -520,6 +519,7 @@
                 if (Math.floor((y - 100) / 10) == Math.floor(fantome[f].y / 10) && Math.floor(x / 10) == Math.floor(fantome[f].x / 10))
                     if (!FantomeBleu) {
                         mode = "scatter"
+                        life--;
                         repositionne()
                         time = 0;
                     }
@@ -563,7 +563,7 @@
 
             x = 140;
             y = HauteurPlateau + 235;
-            life--;
+
             left = false; right = false; haut = false, bas = false, moveleft = false; moveright = false; movehaut = false, movebas = false;
             var SortiePinky = setTimeout(function () {
                 fantome.pinky.x = 140;
@@ -591,9 +591,10 @@
         function GameOver() {
             console.log("GameOver")
             score = 0
-            life = 3;
+
             lvl = 0;
             nextLvl()
+            life = 4;
         }
         function restart() {
 
@@ -623,8 +624,8 @@
             }
         }
         function bleu() {
-            for (f in fantome) 
-            fantome[f].vitesse = 0.5;
+            for (f in fantome)
+                fantome[f].vitesse = 0.5;
             console.log("bleuuuuuuuuuuuuuuuuuuuuuuuuuuu")
             FantomeBleu = true;
             console.log(FantomeBleu)
@@ -647,26 +648,47 @@
         function keyDownHandler(e) {
             if (e.key == "d") {
                 right = true;
+                if (moveright) {
+                    haut = false;
+                    bas = false;
+                }
+
                 if (left)
                     left = false;
             }
             else if (e.key == "q" || e.key == "a") {
                 left = true;
+                if (moveleft) {
+                    haut = false;
+                    bas = false;
+                }
+
                 if (right)
                     right = false;
             }
             else if (e.key == "z" || e.key == "w") {
-                haut = true;
+                if (movehaut) {
+                    haut = true;
+                    left = false;
+                }
+
+                right = false;
                 if (bas)
                     bas = false;
+
             }
             else if (e.key == "s") {
-                bas = true;
+                if (movebas) {
+                    bas = true;
+                    left = false;
+                }
+
+                right = false;
                 if (haut)
                     haut = false;
             }
         }
-        setInterval(function(){draw() }, 20);
+        setInterval(function () { draw() }, 20);
 
         repositionne()
     </script>
