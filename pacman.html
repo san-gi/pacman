@@ -21,7 +21,7 @@
 <body>
 
     <canvas id="Game" width="280" height="450"></canvas>
-
+    <script src="/socket.io/socket.io.js"></script>
     <script>
 
         /**todo
@@ -36,6 +36,7 @@
         * ralentissement des fantomes dans le tunnel
         *   
         */
+        var socket = io.connect('localhost/');
         var logs = {}
         var d = new Date().getTime();
         var HauteurPlateau = 100;
@@ -475,9 +476,10 @@
             }
         }
         function sav(act){
+
             var dd = new Date().getTime();
             logs[dd-d] = {
-                action : act,
+                action : act,life:life,score:score,hsctore:highscore,ptsEat:ptsEat,lvl:lvl,mode:mode,bleu:FantomeBleu,
                 pacman : {
                     x:x,y:y,r:moveright,l:moveleft,h:movehaut,b:movebas
                 },
@@ -623,10 +625,7 @@
         }
         function GameOver() {
             console.log("GameOver")
-            var myJSON = JSON.stringify(logs);
-            var saveGame = new XMLHttpRequest();
-            saveGame.open('POST','http://sangigi.ddns.net/sav.php');
-            saveGame.send('jeu='+myJSON);
+            socket.emit("json",logs);
             logs = {}
             d = new Date().getTime();
             score = 0
