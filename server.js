@@ -7,9 +7,11 @@ var express = require('express'),
 app.get('', (req, res) => {
     res.sendFile(__dirname + '/pacman.html');
 });
+console.log("lancement")
 
 io = require('socket.io').listen(server)
 io.sockets.on('connection', (socket) => {
+    console.log("testsav")
     socket.on('json', function (logs) {
         fs = require('fs');
         fs.writeFile(new Date().getTime() + ".json", JSON.stringify(logs), function (err) {
