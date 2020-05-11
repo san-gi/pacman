@@ -226,7 +226,7 @@
                     fruit = true;
                 if (ptsEat == 2600){
                     repositionne()
-                    nextLvl();
+                    nextLvl();&&&&&&&&&&&&&&
                 }
                     
                 if (score > highscore)
@@ -318,7 +318,7 @@
         }
 
         function nextLvl() {
-            
+            life++;
             time = 0;
             mode = "scatter"
             console.log("nexttttttttttttt")
@@ -392,7 +392,7 @@
                 inverseDir();
             }
 
-            else if (t >= 4200) {
+            else if (t >= 4200 && mode == "scatter") {
                 mode = "chasse";
                 inverseDir();
             }
@@ -591,7 +591,7 @@
         function GameOver() {
             console.log("GameOver")
             score = 0
-            life = 4;
+            life = 3;
             lvl = 0;
             nextLvl()
         }
