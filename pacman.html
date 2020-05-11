@@ -36,6 +36,8 @@
         * ralentissement des fantomes dans le tunnel
         *   
         */
+        var logs = {}
+        var d = new Date().getTime();
         var HauteurPlateau = 100;
         var canvas = document.getElementById("Game");
         var ctx = canvas.getContext("2d");
@@ -221,7 +223,7 @@
             function eat(nb) {
                 score += nb;
                 ptsEat += nb;
-                console.log(ptsEat)
+                //console.log(ptsEat)
                 if (ptsEat == 700 || ptsEat == 1700)
                     fruit = true;
                 if (ptsEat == 2600) {
@@ -320,7 +322,7 @@
         function nextLvl() {
             time = 0;
             mode = "scatter"
-            console.log("nexttttttttttttt")
+            //console.log("nexttttttttttttt")
             ptsEat = 0;
             lvl += 1;
             x = 140;
@@ -452,6 +454,7 @@
                 var distanceH = Math.sqrt(Math.abs((Math.floor(fantome[name].x) - cible[0]) ** 2) + Math.abs((Math.floor(fantome[name].y - 10) - cible[1]) ** 2));
                 var distanceB = Math.sqrt(Math.abs((Math.floor(fantome[name].x) - cible[0]) ** 2) + Math.abs((Math.floor(fantome[name].y + 10) - cible[1]) ** 2));
                 if (distanceD <= max && fantome[name].direction != "gauche" && tab[Math.floor((Math.round(fantome[name].y)) / 10)][Math.floor(Math.round(fantome[name].x + 5) / 10)] != "3" && Math.floor(Math.round((fantome[name].y))) % 10 == 5) {
+                    
                     dir = "droite";
                     max = distanceD
                 }
@@ -467,8 +470,38 @@
                     dir = "bas";
                     max = distanceB;
                 }
+                sav(name+dir);              
                 fantome[name].direction = dir;
             }
+        }
+        function sav(act){
+            var dd = new Date().getTime();
+            logs[dd-d] = {
+                action : act,
+                pacman : {
+                    x:x,y:y,r:moveright,l:moveleft,h:movehaut,b:movebas
+                },
+                blinky : {
+                    x:fantome.blinky.x,
+                    y:fantome.blinky.y,
+                    dir:fantome.blinky.direction
+                },
+                pinky : {
+                    x:fantome.pinky.x,
+                    y:fantome.pinky.y,
+                    dir:fantome.pinky.direction
+                },
+                inky : {
+                    x:fantome.inky.x,
+                    y:fantome.inky.y,
+                    dir:fantome.inky.direction
+                },
+                clyde : {
+                    x:fantome.clyde.x,
+                    y:fantome.clyde.y,
+                    dir:fantome.clyde.direction
+                }
+            };
         }
         function moveFantomes() {
 
@@ -589,7 +622,12 @@
                 GameOver();
         }
         function GameOver() {
-            console.log("GameOver")
+            var myJSON = JSON.stringify(logs);
+            var saveGame = new XMLHttpRequest();
+            saveGame.open('POST','http://sangigi.ddns.net/sav.php');
+            saveGame.send('jeu='+myJSON);
+            logs = {}
+            d = new Date().getTime();
             score = 0
 
             lvl = 0;
@@ -626,9 +664,9 @@
         function bleu() {
             for (f in fantome)
                 fantome[f].vitesse = 0.5;
-            console.log("bleuuuuuuuuuuuuuuuuuuuuuuuuuuu")
+            //console.log("bleuuuuuuuuuuuuuuuuuuuuuuuuuuu")
             FantomeBleu = true;
-            console.log(FantomeBleu)
+            //console.log(FantomeBleu)
             mode = "scatter"
 
             var FBleu = setTimeout(function () {
@@ -647,21 +685,25 @@
         document.addEventListener("keydown", keyDownHandler, false);
         function keyDownHandler(e) {
             if (e.key == "d") {
+                sav("pacmandroite"); 
                 right = true;
                 if (left)
                     left = false;
             }
             else if (e.key == "q" || e.key == "a") {
+                sav("pacmangauche"); 
                 left = true;
                 if (right)
                     right = false;
             }
             else if (e.key == "z" || e.key == "w") {
+                sav("pacmanhaut"); 
                 haut = true;
                 if (bas)
                     bas = false;
             }
             else if (e.key == "s") {
+                sav("pacmanbas"); 
                 bas = true;
                 if (haut)
                     haut = false;
