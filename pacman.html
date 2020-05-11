@@ -622,6 +622,7 @@
                 GameOver();
         }
         function GameOver() {
+            console.log("GameOver")
             var myJSON = JSON.stringify(logs);
             var saveGame = new XMLHttpRequest();
             saveGame.open('POST','http://sangigi.ddns.net/sav.php');
