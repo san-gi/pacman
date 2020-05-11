@@ -648,42 +648,21 @@
         function keyDownHandler(e) {
             if (e.key == "d") {
                 right = true;
-                if (moveright) {
-                    haut = false;
-                    bas = false;
-                }
-
                 if (left)
                     left = false;
             }
             else if (e.key == "q" || e.key == "a") {
                 left = true;
-                if (moveleft) {
-                    haut = false;
-                    bas = false;
-                }
-
                 if (right)
                     right = false;
             }
             else if (e.key == "z" || e.key == "w") {
-                if (movehaut) {
-                    haut = true;
-                    left = false;
-                }
-
-                right = false;
+                haut = true;
                 if (bas)
                     bas = false;
-
             }
             else if (e.key == "s") {
-                if (movebas) {
-                    bas = true;
-                    left = false;
-                }
-
-                right = false;
+                bas = true;
                 if (haut)
                     haut = false;
             }
