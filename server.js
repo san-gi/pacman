@@ -3,10 +3,23 @@ var express = require('express'),
     server = require('http').createServer(app),
     fs = require('fs');
 
+    app.use(express.static('static')) //dossier static
+
+
 
 app.get('', (req, res) => {
-    res.sendFile(__dirname + '/pacman.html');
+    res.sendFile(__dirname + '/static/refactor.html');
 });
+
+
+
+
+
+
+
+
+
+
 console.log("lancement")
 
 io = require('socket.io').listen(server)
