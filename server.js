@@ -10,6 +10,9 @@ var express = require('express'),
 app.get('', (req, res) => {
     res.sendFile(__dirname + '/static/refactor.html');
 });
+app.get('', (req, res) => {
+    res.sendFile(__dirname + '/static/pacman.html');
+});
 
 
 
