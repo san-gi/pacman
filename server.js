@@ -15,14 +15,6 @@ app.get('', (req, res) => {
 });
 
 
-
-
-
-
-
-
-
-
 console.log("lancement")
 
 io = require('socket.io').listen(server)
