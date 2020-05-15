@@ -1,4 +1,3 @@
-
 var jeuW;
 var jeuH;
 var canvas = document.getElementById("Game");
@@ -7,7 +6,7 @@ var taille;
 var pacman = {
     x: 13.5,
     y: 23,
-    vitesse: 0.15,
+    vitesse: 0.08,
     direction: null,
     directionSuivante: null
 }
@@ -20,15 +19,17 @@ var life = 4;
 var lvl = 1;
 var mode = "scatter";
 var FantomeBleu = false;
-var fantomeEat=200;
-
+var fantomeEat = 200;
+var socket = io.connect('192.168.2.97');
+var logs = {}
+var d = new Date().getTime();
 var fantome = {
     blinky: {
         x: 13.5,
         y: 11,
         couleur: "#FF0000",
         direction: "gauche",
-        vitesse: 0.05,
+        vitesse: 0.07,
         sortie: true,
         choix: false,
     },
@@ -37,7 +38,7 @@ var fantome = {
         y: 14,
         couleur: "#FF00FF",
         direction: "gauche",
-        vitesse: 0.05,
+        vitesse: 0.07,
         sortie: false,
         choix: false,
     },
@@ -46,7 +47,7 @@ var fantome = {
         y: 14,
         couleur: "#00FFFF",
         direction: "gauche",
-        vitesse: 0.05,
+        vitesse: 0.07,
         sortie: false,
         choix: false,
     },
@@ -55,31 +56,30 @@ var fantome = {
         y: 14,
         couleur: "#FF9900",
         direction: "gauche",
-        vitesse: 0.05,
+        vitesse: 0.07,
         sortie: false,
         choix: false,
     }
 }
-
-
-
 window.onresize = function () {
     this.resize();
 }
 
 function resize() {
     var h = window.innerHeight;
+    var w = window.innerWidth;
     ratio = 280 / 450;
-    document.getElementById('Game').width = h * (280 / 450);
-    jeuW = h * (280 / 450)
-    document.getElementById('Game').height = h;
-    jeuH = h;
+    
+    jeuW = (h-240) * (280 / 450)
+    
+    jeuH = (h-240);
     console.log(document.getElementById('Game').offsetHeight + " " + document.getElementById('Game').offsetWidth)
     taille = jeuH / 45 - ((jeuH / 45) % 2);
+    document.getElementById('Game').width = taille*28;
+    document.getElementById('Game').height = taille*44;
     drawMap();
     drawinfo();
 }
-
 var tab =
     [["2", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "5", "2", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "5"],
     ["0", "6", "6", "6", "6", "6", "7", "6", "6", "6", "6", "6", "6", "0", "0", "6", "6", "6", "6", "6", "6", "7", "6", "6", "6", "6", "6", "0"],
@@ -127,9 +127,9 @@ var tabEat =
     ["0", "0", "0", "0", "0", "0", "1", "0", "0", "0", "0", "0", "3", "0", "0", "3", "0", "0", "0", "0", "0", "1", "0", "0", "0", "0", "0", "0"],
     ["0", "0", "0", "0", "0", "0", "1", "0", "0", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "0", "0", "1", "0", "0", "0", "0", "0", "0"],
     ["0", "0", "0", "0", "0", "0", "1", "0", "0", "3", "0", "0", "0", "0", "0", "0", "0", "0", "3", "0", "0", "1", "0", "0", "0", "0", "0", "0"],
-    ["0", "0", "0", "0", "0", "0", "1", "0", "0", "3", "0", "0", "0", "0", "0", "0", "0", "0", "3", "0", "0", "1", "0", "0", "0", "0", "0", "0"],
-    ["3", "3", "3", "3", "3", "3", "1", "3", "3", "3", "0", "0", "0", "0", "0", "0", "0", "0", "3", "3", "3", "1", "3", "3", "3", "3", "3", "3"],
-    ["0", "0", "0", "0", "0", "0", "1", "0", "0", "3", "0", "0", "0", "0", "0", "0", "0", "0", "3", "0", "0", "1", "0", "0", "0", "0", "0", "0"],
+    ["0", "0", "0", "0", "0", "0", "1", "0", "0", "3", "0", "3", "3", "3", "3", "3", "3", "0", "3", "0", "0", "1", "0", "0", "0", "0", "0", "0"],
+    ["3", "3", "3", "3", "3", "3", "1", "3", "3", "3", "0", "3", "3", "3", "3", "3", "3", "0", "3", "3", "3", "1", "3", "3", "3", "3", "3", "3"],
+    ["0", "0", "0", "0", "0", "0", "1", "0", "0", "3", "0", "3", "3", "3", "3", "3", "3", "0", "3", "0", "0", "1", "0", "0", "0", "0", "0", "0"],
     ["0", "0", "0", "0", "0", "0", "1", "0", "0", "3", "0", "0", "0", "0", "0", "0", "0", "0", "3", "0", "0", "1", "0", "0", "0", "0", "0", "0"],
     ["0", "0", "0", "0", "0", "0", "1", "0", "0", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "0", "0", "1", "0", "0", "0", "0", "0", "0"],
     ["0", "0", "0", "0", "0", "0", "1", "0", "0", "3", "0", "0", "0", "0", "0", "0", "0", "0", "3", "0", "0", "1", "0", "0", "0", "0", "0", "0"],
@@ -161,11 +161,20 @@ function draw() {
     drawEat();
     drawPacman();
     drawFantomes();
+    if (fruit)
+        drawFruit();
 
+}
+function drawFruit() {
+    ctx.beginPath();
+    ctx.arc(14 * taille, 25.5 * taille, taille / 1.5, 0, Math.PI * 2);
+    ctx.fillStyle = "#cd5757";
+    ctx.fill();
+    ctx.closePath();
 }
 function bleu() {
     for (f in fantome)
-        fantome[f].vitesse = 0.02;
+        fantome[f].vitesse = 0.035;
 
     FantomeBleu = true;
 
@@ -265,8 +274,8 @@ function drawFantomes() {
             if (FantomeBleu) {
                 fantome[f].x = 13.5;
                 fantome[f].y = 14;
-                score+=fantomeEat;
-                fantomeEat+=fantomeEat;
+                score += fantomeEat;
+                fantomeEat += fantomeEat;
                 var r = f;
                 var manger = setTimeout(function () {
                     fantome[r].x = 13.5;
@@ -285,13 +294,20 @@ function drawFantomes() {
 
         ctx.beginPath();
         ctx.arc(fantome[f].x * taille + taille / 2, fantome[f].y * taille + taille / 2 + 8 * taille, taille / 1.8, 0, Math.PI * 2);
-        ctx.fillStyle = fantome[f].couleur;
+        if (!FantomeBleu)
+            ctx.fillStyle = fantome[f].couleur;
+        else
+            ctx.fillStyle = "#0000ff";
         ctx.fill();
         ctx.closePath();
     }
 }
 
 function GameOver() {
+    if(score>1000)
+    socket.emit("json", logs);
+    logs = {}
+    d = new Date().getTime();
     console.log("GameOver")
     nextLvl();
     lvl = 1;
@@ -364,12 +380,40 @@ function choixDirection(name) {
             dir = "bas";
             max = distanceB;
         }
+        sav(name + dir);
         fantome[name].direction = dir;
     }
 }
-
-
-
+function sav(act) {
+    console.log("sav")
+    var dd = new Date().getTime();
+    logs[dd - d] = {
+        action: act, life: life, score: score, hsctore: highscore, ptsEat: ptsEat, lvl: lvl, mode: mode, bleu: FantomeBleu,
+        pacman: {
+            x: pacman.x, y: pacman.y,
+        },
+        blinky: {
+            x: fantome.blinky.x,
+            y: fantome.blinky.y,
+            dir: fantome.blinky.direction
+        },
+        pinky: {
+            x: fantome.pinky.x,
+            y: fantome.pinky.y,
+            dir: fantome.pinky.direction
+        },
+        inky: {
+            x: fantome.inky.x,
+            y: fantome.inky.y,
+            dir: fantome.inky.direction
+        },
+        clyde: {
+            x: fantome.clyde.x,
+            y: fantome.clyde.y,
+            dir: fantome.clyde.direction
+        }
+    };
+}
 function drawPacman() {
     if (pacman.x <= pacman.vitesse)
         pacman.x = 27 - pacman.vitesse;
@@ -591,18 +635,12 @@ function drawEat() {
             }
         }
     }
+    if (fruit && Math.round(pacman.y) == 17 && Math.round(pacman.x * 2) == 27) {
+        fruit = false;
+        score += 100;
+    }
 }
 function drawMap() {
-    /*
-    '0':vertical 
-    '1':horizontal 
-    '2':angle bas-droit 
-    '3':angle droit-haut 
-    '4':angle haut-gauche  
-    '5':angle gauche-bas
-    '6':vide
-    '7'case de choix de direction pour fantome
-    */
     for (var i = 0; i < 28; i++) {
         for (var j = 0; j < 31; j++) {
             switch (tab[j][i]) {
@@ -667,21 +705,25 @@ document.addEventListener("keydown", keyDownHandler, false);
 function keyDownHandler(e) {
     console.log(e.key)
     if (e.key == "d") {
+        sav("pacmandroite");
         if (pacman.direction == "gauche" || pacman.direction == null)
             pacman.direction = "droite";
         pacman.directionSuivante = "droite";
     }
     else if (e.key == "q" || e.key == "a") {
+        sav("pacmangauche");
         if (pacman.direction == "droite" || pacman.direction == null)
             pacman.direction = "gauche";
         pacman.directionSuivante = "gauche";
     }
     else if (e.key == "z" || e.key == "w") {
+        sav("pacmanhaut");
         if (pacman.direction == "bas" || pacman.direction == null)
             pacman.direction = "haut";
         pacman.directionSuivante = "haut";
     }
     else if (e.key == "s") {
+        sav("pacmanbas");
         if (pacman.direction == "haut" || pacman.direction == null)
             pacman.direction = "bas";
         pacman.directionSuivante = "bas";

@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
-<body class=" bg-secondary">
+<body>
 
     <nav class="navbar navbar-expand-lg navbar-dark  bg-dark">
         <a class="navbar-brand" href="refactor.html">Pac-Man !</a>
@@ -19,27 +19,25 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link active" href="refactor.html">Pac-Man ! <span
-                        class="sr-only">(current)</span></a>
+                <a class="nav-item nav-link active" href="refactor.html">Pac-Man ! <span class="sr-only">(current)</span></a>
                 <a class="nav-item nav-link" href="historique.html">Historique</a>
                 <a class="nav-item nav-link" href="analyse.html">Analyse</a>
             </div>
         </div>
     </nav>
-    <div class="container">
-        <div class="row justify-content-md-center">
-            <div class="col-md-auto bg-primary">
-                1 of 3
-            </div>
-            <div class="col-md-auto bg-secondary">
-                <canvas id="Game" width="280" height="450"></canvas>
-            </div>
-            <div class="col-md-auto bg-success">
-                3 of 3
-            </div>
+
+    <div class="row justify-content-md-center">
+        <div class="col bg-primary">
+            1 of 3
+        </div>
+        <div class="col-md-auto bg-secondary">
+            2 of 3
+        </div>
+        <div class="col bg-success">
+            3 of 3
         </div>
     </div>
-
+    <!-- Footer -->
     <footer class="page-footer font-small teal pt-4 bg-dark text-light">
         <div class="container-fluid text-center text-md-left">
             <div class="row">
@@ -65,6 +63,8 @@
             <a href="https://mdbootstrap.com/"> sangigi.ddns.com</a>
         </div>
     </footer>
+
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
         crossorigin="anonymous"></script>
