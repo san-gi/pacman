@@ -23,6 +23,8 @@ var fantomeEat = 200;
 var socket = io.connect('192.168.2.97');
 var logs = {}
 var d = new Date().getTime();
+var SortieInky;
+var SortieClyde
 var fantome = {
     blinky: {
         x: 13.5,
@@ -183,7 +185,7 @@ function bleu() {
     var FBleu = setTimeout(function () {
         FantomeBleu = false;
         for (e in fantome)
-            fantome[e].vitesse = 0.05;
+            fantome[e].vitesse = 0.07;
     }, 5000);
 }
 function tempo(t) {
@@ -304,6 +306,8 @@ function drawFantomes() {
 }
 
 function GameOver() {
+    logs.score=score;
+    logs.lvl=lvl;
     if(score>1000)
     socket.emit("json", logs);
     logs = {}
@@ -313,6 +317,7 @@ function GameOver() {
     lvl = 1;
     life = 4;
     score = 0;
+
 }
 function choixDirection(name) {
     if (!fantome[name].choix) {
@@ -503,11 +508,15 @@ function eat(nb) {
     drawinfo();
 }
 function nextLvl() {
+    clearTimeout(SortieInky);
+    clearTimeout(SortieClyde);
     fantome.inky.sortie = false;
     fantome.clyde.sortie = false;
+    repositionne();
+    
     ptsEat = 0;
     lvl += 1;
-    repositionne();
+    
 
     for (var i = 0; i < 28; i++) {
         for (var j = 0; j < 31; j++) {
@@ -542,7 +551,7 @@ function repositionne() {
 
     }, 1500);
     if (ptsEat >= 300 && fantome.inky.sortie)
-        var SortieInky = setTimeout(function () {
+        SortieInky = setTimeout(function () {
             console.log("il part")
             fantome.inky.x = 13.5;
             fantome.inky.y = 11;
@@ -550,7 +559,7 @@ function repositionne() {
             fantome.inky.direction = "gauche";
         }, 3000);
     if (ptsEat > 870 && fantome.clyde.sortie)
-        var SortieInky = setTimeout(function () {
+        SortieClyde = setTimeout(function () {
             fantome.clyde.x = 13.5;
             fantome.clyde.y = 11;
 
