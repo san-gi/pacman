@@ -71,14 +71,14 @@ function resize() {
     var h = window.innerHeight;
     var w = window.innerWidth;
     ratio = 280 / 450;
-    
-    jeuW = (h-240) * (280 / 450)
-    
-    jeuH = (h-240);
+
+    jeuW = (h - 240) * (280 / 450)
+
+    jeuH = (h - 240);
     console.log(document.getElementById('Game').offsetHeight + " " + document.getElementById('Game').offsetWidth)
     taille = jeuH / 45 - ((jeuH / 45) % 2);
-    document.getElementById('Game').width = taille*28;
-    document.getElementById('Game').height = taille*44;
+    document.getElementById('Game').width = taille * 28;
+    document.getElementById('Game').height = taille * 44;
     drawMap();
     drawinfo();
 }
@@ -306,10 +306,10 @@ function drawFantomes() {
 }
 
 function GameOver() {
-    logs.score=score;
-    logs.lvl=lvl;
-    if(score>1000)
-    socket.emit("json", logs);
+    logs.score = score;
+    logs.lvl = lvl;
+    if (score > 1000)
+        socket.emit("json", logs);
     logs = {}
     d = new Date().getTime();
     console.log("GameOver")
@@ -390,10 +390,14 @@ function choixDirection(name) {
     }
 }
 function sav(act) {
+    var tabSav ="";
+    for (var i = 0; i < 31; i++) {
+        tabSav+=tabEat[i].join()+"-"
+    }
     console.log("sav")
     var dd = new Date().getTime();
     logs[dd - d] = {
-        action: act, life: life, score: score, hsctore: highscore, ptsEat: ptsEat, lvl: lvl, mode: mode, bleu: FantomeBleu,
+        action: act, life: life, score: score, hsctore: highscore, ptsEat: ptsEat, lvl: lvl, mode: mode, bleu: FantomeBleu, tabsav: tabSav,
         pacman: {
             x: pacman.x, y: pacman.y,
         },
@@ -513,10 +517,10 @@ function nextLvl() {
     fantome.inky.sortie = false;
     fantome.clyde.sortie = false;
     repositionne();
-    
+
     ptsEat = 0;
     lvl += 1;
-    
+
 
     for (var i = 0; i < 28; i++) {
         for (var j = 0; j < 31; j++) {
