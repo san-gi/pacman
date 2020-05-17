@@ -20,7 +20,7 @@ var lvl = 1;
 var mode = "scatter";
 var FantomeBleu = false;
 var fantomeEat = 200;
-var socket = io.connect('192.168.2.97');
+var socket = io.connect('sangigi.ddns.net');
 var logs = {}
 var d = new Date().getTime();
 var SortieInky;
