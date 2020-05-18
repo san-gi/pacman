@@ -134,7 +134,7 @@ function ajout() {
             </tr>`)
     }
 }
-
+var socket = io.connect('sangigi.ddns.net');
 var time = 0;
 var score = 0;
 var ptsEat = 0;
