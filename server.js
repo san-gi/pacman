@@ -52,7 +52,7 @@ io.sockets.on('connection', (socket) => {
         fs.readFile("./sav/"+name, (err, data) => {
             if (err) throw err;
             let student = JSON.parse(data);
-            console.log(student);
+            
             console.log("oui");
             socket.broadcast.emit('postJson', student);
         });
