@@ -10,6 +10,7 @@ var pacman = {
     direction: null,
     directionSuivante: null
 }
+var action = "";
 var time = 0;
 var score = 0;
 var ptsEat = 0;
@@ -25,6 +26,7 @@ var logs = {}
 var d = new Date().getTime();
 var SortieInky;
 var SortieClyde
+var pause = false;
 var fantome = {
     blinky: {
         x: 13.5,
@@ -156,15 +158,17 @@ for (var i = 0; i < 31; i++) {
 }
 
 function draw() {
-    if (!FantomeBleu) {
-        time++;
-        tempo(time);
+    if (!pause) {
+        if (!FantomeBleu) {
+            time++;
+            tempo(time);
+        }
+        drawEat();
+        drawPacman();
+        drawFantomes();
+        if (fruit)
+            drawFruit();
     }
-    drawEat();
-    drawPacman();
-    drawFantomes();
-    if (fruit)
-        drawFruit();
 
 }
 function drawFruit() {
@@ -390,38 +394,43 @@ function choixDirection(name) {
     }
 }
 function sav(act) {
-    var tabSav ="";
-    for (var i = 0; i < 31; i++) {
-        tabSav+=tabEat[i].join()+"-"
-    }
-    console.log("sav")
-    var dd = new Date().getTime();
-    logs[dd - d] = {
-        action: act, life: life, score: score, hsctore: highscore, ptsEat: ptsEat, lvl: lvl, mode: mode, bleu: FantomeBleu, tabsav: tabSav,
-        pacman: {
-            x: pacman.x, y: pacman.y,
-        },
-        blinky: {
-            x: fantome.blinky.x,
-            y: fantome.blinky.y,
-            dir: fantome.blinky.direction
-        },
-        pinky: {
-            x: fantome.pinky.x,
-            y: fantome.pinky.y,
-            dir: fantome.pinky.direction
-        },
-        inky: {
-            x: fantome.inky.x,
-            y: fantome.inky.y,
-            dir: fantome.inky.direction
-        },
-        clyde: {
-            x: fantome.clyde.x,
-            y: fantome.clyde.y,
-            dir: fantome.clyde.direction
+    if (action != act) {
+        action=act;
+
+        var tabSav = "";
+        for (var i = 0; i < 31; i++) {
+            tabSav += tabEat[i].join() + "-"
         }
-    };
+        console.log("sav")
+        var dd = new Date().getTime();
+        logs[dd - d] = {
+            action: act, life: life, score: score, hsctore: highscore, ptsEat: ptsEat, lvl: lvl, mode: mode, bleu: FantomeBleu, tabsav: tabSav,
+            pacman: {
+                x: pacman.x, y: pacman.y,
+            },
+            blinky: {
+                x: fantome.blinky.x,
+                y: fantome.blinky.y,
+                dir: fantome.blinky.direction
+            },
+            pinky: {
+                x: fantome.pinky.x,
+                y: fantome.pinky.y,
+                dir: fantome.pinky.direction
+            },
+            inky: {
+                x: fantome.inky.x,
+                y: fantome.inky.y,
+                dir: fantome.inky.direction
+            },
+            clyde: {
+                x: fantome.clyde.x,
+                y: fantome.clyde.y,
+                dir: fantome.clyde.direction
+            }
+        };
+
+    }
 }
 function drawPacman() {
     if (pacman.x <= pacman.vitesse)
@@ -717,29 +726,32 @@ function drawMap() {
 document.addEventListener("keydown", keyDownHandler, false);
 function keyDownHandler(e) {
     console.log(e.key)
-    if (e.key == "d") {
+    if (e.key == "d" || e.key == "ArrowRight") {
         sav("pacmandroite");
         if (pacman.direction == "gauche" || pacman.direction == null)
             pacman.direction = "droite";
         pacman.directionSuivante = "droite";
     }
-    else if (e.key == "q" || e.key == "a") {
+    else if (e.key == "q" || e.key == "a" || e.key == "ArrowLeft") {
         sav("pacmangauche");
         if (pacman.direction == "droite" || pacman.direction == null)
             pacman.direction = "gauche";
         pacman.directionSuivante = "gauche";
     }
-    else if (e.key == "z" || e.key == "w") {
+    else if (e.key == "z" || e.key == "w" || e.key == "ArrowUp") {
         sav("pacmanhaut");
         if (pacman.direction == "bas" || pacman.direction == null)
             pacman.direction = "haut";
         pacman.directionSuivante = "haut";
     }
-    else if (e.key == "s") {
+    else if (e.key == "s" || e.key == "ArrowDown") {
         sav("pacmanbas");
         if (pacman.direction == "haut" || pacman.direction == null)
             pacman.direction = "bas";
         pacman.directionSuivante = "bas";
+    } else if (e.key == " ") {
+        pause = !pause;
+
     }
 }
 

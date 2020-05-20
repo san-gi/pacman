@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
-<body>
+<body class="h-100 bg-dark">
 
     <nav class="navbar navbar-expand-lg navbar-dark  bg-dark">
         <a class="navbar-brand" href="refactor.html">Pac-Man !</a>
@@ -19,39 +19,61 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link active" href="refactor.html">Pac-Man ! <span class="sr-only">(current)</span></a>
+                <a class="nav-item nav-link active" href="refactor.html">Pac-Man ! <span
+                        class="sr-only">(current)</span></a>
                 <a class="nav-item nav-link" href="historique.html">Historique</a>
                 <a class="nav-item nav-link" href="analyse.html">Analyse</a>
             </div>
         </div>
     </nav>
 
-    <div style="height: 100px; background-color: rgba(255,0,0,0.1);">
-        <div class="h-25 d-inline-block" style="width: 120px; background-color: rgba(0,0,255,.1)">Height 25%</div>
-        <div class="h-50 d-inline-block" style="width: 120px; background-color: rgba(0,0,255,.1)">Height 50%</div>
-        <div class="h-75 d-inline-block" style="width: 120px; background-color: rgba(0,0,255,.1)">Height 75%</div>
-        <div class="h-100 d-inline-block" style="width: 120px; background-color: rgba(0,0,255,.1)">Height 100%</div>
-      </div>
+    <div class="d-flex align-content-around flex-wrap">
+        <div id="listFiles" class="table-wrapper-scroll-y bg-dark overflow-auto">
+            <table class="table table-striped table-dark ">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">name</th>
+                        <th scope="col">score</th>
+                        <th scope="col">lvl</th>
+                        <th scope="col">date</th>
+                    </tr>
+                </thead>
+                <tbody class="tab">
+                </tbody>
+            </table>
+        </div>
+        <div class=" bg-dark">
+            <canvas id="Game" width="280" height="450"></canvas>
+        </div>
+        <div class="bg-dark">
+
+            <div class="btn-group-vertical mr-2" role="group" aria-label="First group">
+                <button type="button" class="btn btn-secondary" onclick="pause()">Pause</button>
+                <button type="button" class="btn btn-secondary" onclick="resetSelect()">Start</button>
+                <button type="button" class="btn btn-secondary" onclick="rapide()">plus rapide</button>
+                <button type="button" class="btn btn-secondary" onclick="lent()">moins rapide</button>
+            </div>
+
+        </div>
+    </div>
     <!-- Footer -->
     <footer class="page-footer font-small teal pt-4 bg-dark text-light">
         <div class="container-fluid text-center text-md-left">
             <div class="row">
                 <div class="col-md-6 mt-md-0 mt-3">
-                    <h5 class="text-uppercase font-weight-bold">Pac man</h5>
-                    <p>Pac-Man (パックマン, Pakkuman?) (à l'origine Puckman1) est un jeu vidéo créé par Tōru Iwatani pour l’entreprise japonaise Namco, sorti au Japon le 22 mai 19802. Le jeu consiste à déplacer Pac-Man, un personnage qui, vu de profil, ressemble à un diagramme circulaire à l’intérieur d’un labyrinthe, afin de lui faire manger toutes les pac-gommes qui s’y trouvent en évitant d’être touché par des fantômes.
-
-Lorsque Pac-Man est sorti, les jeux vidéo d'arcade les plus populaires étaient les jeux de tir, en particulier les Space Invaders et Asteroids. La minorité la plus visible étaient des jeux de sport qui étaient pour la plupart dérivés de Pong. Pac-Man leur a succédé en créant un nouveau genre. Pac-Man est souvent crédité en tant que point de repère dans l'histoire du jeu vidéo, et est parmi les plus célèbres jeux d'arcade de tous les temps. Il est également l'un des jeux vidéo avec les plus grosses recettes de tous les temps, ayant généré plus de 2,5 milliards de $ au cours des trimestres des années 1990.
-
-Le personnage est apparu dans plus de 30 spin-offs sous licence officielle, ainsi que dans de nombreux clones et bootlegs non autorisés. Selon le Davie-Brown Index (en), Pac-Man a la notoriété de marque la plus élevée de tous les personnages de jeu vidéo auprès des consommateurs américains3, reconnu par 94 % d'entre eux. Pac-Man est l'une des plus longues franchises de jeux vidéo de l'âge d'or des jeux vidéo d'arcade. Il fait partie de la collection de la Smithsonian Institution à Washington, DC4 et du Museum of Modern Art de New York5. </p>
+                    <h5 class="text-uppercase font-weight-bold">Pac-Man</h5>
+                    <p>Pac-Man est un jeu vidéo créé par Tōru Iwatani pour l’entreprise japonaise Namco, sorti au Japon
+                        le 22 mai 19802. Le jeu consiste à déplacer Pac-Man, un personnage qui, vu de profil, ressemble
+                        à un diagramme circulaire à l’intérieur d’un labyrinthe, afin de lui faire manger toutes les
+                        pac-gommes qui s’y trouvent en évitant d’être touché par des fantômes.
+                    </p>
                 </div>
                 <hr class="clearfix w-100 d-md-none pb-3">
                 <div class="col-md-6 mb-md-0 mb-3">
-                    <h5 class="text-uppercase font-weight-bold">Footer text 2</h5>
-                    <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Optio deserunt fuga perferendis modi
-                        earum
-                        commodi aperiam temporibus quod nulla nesciunt aliquid debitis ullam omnis quos ipsam,
-                        aspernatur id
-                        excepturi hic.</p>
+                    <h5 class="text-uppercase font-weight-bold">Namco</h5>
+                    <p>Namco possé e toujours les roit e pacman. le clone créer ici n'est pas a but commercial, il n'y a
+                        onc je suppose, aucun soucis</p>
                 </div>
             </div>
         </div>
@@ -71,9 +93,8 @@ Le personnage est apparu dans plus de 30 spin-offs sous licence officielle, ains
         integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
         crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript" src="script.js">
+    <script type="text/javascript" src="analyse.js"></script>
 
-    </script>
 
 </body>
 

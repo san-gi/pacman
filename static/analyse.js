@@ -6,9 +6,10 @@ var fiche;
 var inst = [];
 var inter;
 var i = 0;
-var vitesse = 100;
+var vitesse = 10;
 var clé = Math.random();
 var Pause = false;
+var origine = {};
 socket.emit("filesRequest");
 socket.on('filesPost', (files) => {
     names = files;
@@ -29,14 +30,84 @@ socket.on('postJson', (fichierJson, retourclé) => {
 })
 
 function start() {
-
+    var arbre = origine;
+    var chaine = "";
+    
     for (action in fiche) {
         inst.push(action)
     }
+
+    var lvl = fiche[inst[i]].lvl
+        
     try {
         inter = setInterval(function () {
+            if (fiche[inst[i]].lvl != lvl){
+                lvl = fiche[inst[i]].lvl
+                arbre = origine;
+                console.log("oui")
+            }
+            if (Math.round(fiche[inst[i]].pacman.x) + "" +
+                Math.round(fiche[inst[i]].pacman.y) + "" +
+                Math.round(fiche[inst[i]].blinky.y) + "" +
+                Math.round(fiche[inst[i]].blinky.y) + "" +
+                Math.round(fiche[inst[i]].pinky.y) + "" +
+                Math.round(fiche[inst[i]].pinky.y) + "" +
+                Math.round(fiche[inst[i]].inky.y) + "" +
+                Math.round(fiche[inst[i]].inky.y) + "" +
+                Math.round(fiche[inst[i]].clyde.y) + "" +
+                Math.round(fiche[inst[i]].clyde.y) != chaine) {
+                try {
 
+                    arbre[Math.round(fiche[inst[i]].pacman.x) + "" +
+                        Math.round(fiche[inst[i]].pacman.y) + "" +
+                        Math.round(fiche[inst[i]].blinky.y) + "" +
+                        Math.round(fiche[inst[i]].blinky.y) + "" +
+                        Math.round(fiche[inst[i]].pinky.y) + "" +
+                        Math.round(fiche[inst[i]].pinky.y) + "" +
+                        Math.round(fiche[inst[i]].inky.y) + "" +
+                        Math.round(fiche[inst[i]].inky.y) + "" +
+                        Math.round(fiche[inst[i]].clyde.y) + "" +
+                        Math.round(fiche[inst[i]].clyde.y)
+                    ].total += 1;
+                    console.log("total++")
+                } catch (error) {
+                    arbre[Math.round(fiche[inst[i]].pacman.x) + "" +
+                        Math.round(fiche[inst[i]].pacman.y) + "" +
+                        Math.round(fiche[inst[i]].blinky.y) + "" +
+                        Math.round(fiche[inst[i]].blinky.y) + "" +
+                        Math.round(fiche[inst[i]].pinky.y) + "" +
+                        Math.round(fiche[inst[i]].pinky.y) + "" +
+                        Math.round(fiche[inst[i]].inky.y) + "" +
+                        Math.round(fiche[inst[i]].inky.y) + "" +
+                        Math.round(fiche[inst[i]].clyde.y) + "" +
+                        Math.round(fiche[inst[i]].clyde.y)
 
+                    ] = {
+                        win: 0,
+                        total: 1
+                    }
+                }
+                arbre = arbre[Math.round(fiche[inst[i]].pacman.x) + "" +
+                    Math.round(fiche[inst[i]].pacman.y) + "" +
+                    Math.round(fiche[inst[i]].blinky.y) + "" +
+                    Math.round(fiche[inst[i]].blinky.y) + "" +
+                    Math.round(fiche[inst[i]].pinky.y) + "" +
+                    Math.round(fiche[inst[i]].pinky.y) + "" +
+                    Math.round(fiche[inst[i]].inky.y) + "" +
+                    Math.round(fiche[inst[i]].inky.y) + "" +
+                    Math.round(fiche[inst[i]].clyde.y) + "" +
+                    Math.round(fiche[inst[i]].clyde.y)]
+                chaine = Math.round(fiche[inst[i]].pacman.x) + "" +
+                    Math.round(fiche[inst[i]].pacman.y) + "" +
+                    Math.round(fiche[inst[i]].blinky.y) + "" +
+                    Math.round(fiche[inst[i]].blinky.y) + "" +
+                    Math.round(fiche[inst[i]].pinky.y) + "" +
+                    Math.round(fiche[inst[i]].pinky.y) + "" +
+                    Math.round(fiche[inst[i]].inky.y) + "" +
+                    Math.round(fiche[inst[i]].inky.y) + "" +
+                    Math.round(fiche[inst[i]].clyde.y) + "" +
+                    Math.round(fiche[inst[i]].clyde.y);
+            }
 
             var ea = fiche[inst[i]].tabsav.split('-');
             for (var j = 0; j < ea.length; j++) {
@@ -105,6 +176,7 @@ function start() {
 }
 
 function resetSelect() {
+
     clearInterval(inter);
     inst = [];
     inter = null;
