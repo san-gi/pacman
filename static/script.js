@@ -10,6 +10,7 @@ var pacman = {
     direction: null,
     directionSuivante: null
 }
+var up = false;
 var action = "";
 var time = 0;
 var score = 0;
@@ -168,6 +169,10 @@ function draw() {
         drawFantomes();
         if (fruit)
             drawFruit();
+            if(score>10000&&!up){
+                life++
+                up = true;
+            }
     }
 
 }
