@@ -26,10 +26,9 @@ fs.readdir(testFolder, (err, files) => {
     });
 });
 var origine = {};
-var DataOrigine
 fs.readFile('./static/arbre.json', function (err, data) {
     if (err) throw err;
-    DataOrigine = JSON.parse(data);;
+    origine = JSON.parse(data);;
 });
 console.log("lancement")
 async function makeArbre(logs) {
