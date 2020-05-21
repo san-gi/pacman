@@ -1,4 +1,4 @@
-var socket = io.connect('sangigi.ddns.net');
+var socket = io.connect('192.168.2.97');
 var names = [];
 var canvas = document.getElementById("Game");
 var ctx = canvas.getContext("2d");
@@ -241,7 +241,7 @@ var lvl = 1;
 var mode = "scatter";
 var FantomeBleu = false;
 var fantomeEat = 200;
-var socket = io.connect('sangigi.ddns.net');
+var socket = io.connect('192.168.2.97');
 var logs = {}
 var d = new Date().getTime();
 var SortieInky;
