@@ -19,6 +19,13 @@ app.get('', (req, res) => {
 app.get('', (req, res) => {
     res.sendFile(__dirname + '/static/analyse.html');
 });
+app.get('', (req, res) => {
+    res.sendFile(__dirname + '/static/apprentissage.html');
+});
+app.get('', (req, res) => {
+    res.sendFile(__dirname + '/static/arbreMCTS.json');
+});
+
 
 fs.readdir(testFolder, (err, files) => {
     files.forEach(file => {
@@ -85,6 +92,26 @@ async function makeArbre(logs) {
 
 io = require('socket.io').listen(server)
 io.sockets.on('connection', (socket) => {
+    socket.on("getMCTS" ,()=>{
+        console.log("getMCTS")
+        fs.readFile("./static/arbreMCTS.json", (err, data) => {
+            if (err) throw err;
+            let M = JSON.parse(data);
+            console.log(M)
+            socket.emit('MCTS', M);
+        });
+    })
+
+    socket.on("updateMCTS", (MCTS) =>{
+        fs.writeFile("./static/arbreMCTS.json", MCTS, function (err) {
+            if (err) return console.log(err);
+            console.log('updateMCTS');
+    
+        });
+    })
+
+
+
     console.log("testsav")
     socket.on('json', function (logs) {
         makeArbre(logs);
@@ -98,7 +125,7 @@ io.sockets.on('connection', (socket) => {
             });
     });
     socket.on('filesRequest', () => {
-        console.log(f);
+
         console.log("files request")
         socket.emit('filesPost', f);
     });
