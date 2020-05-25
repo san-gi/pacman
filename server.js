@@ -23,7 +23,13 @@ app.get('', (req, res) => {
     res.sendFile(__dirname + '/static/apprentissage.html');
 });
 app.get('', (req, res) => {
+    res.sendFile(__dirname + '/static/apprentissage2.html');
+});
+app.get('', (req, res) => {
     res.sendFile(__dirname + '/static/arbreMCTS.json');
+});
+app.get('', (req, res) => {
+    res.sendFile(__dirname + '/static/arbreMCTS2.json');
 });
 
 
@@ -97,7 +103,7 @@ io.sockets.on('connection', (socket) => {
         fs.readFile("./static/arbreMCTS.json", (err, data) => {
             if (err) throw err;
             let M = JSON.parse(data);
-            console.log(M)
+            console.log("edit MCTS")
             socket.emit('MCTS', M);
         });
     })
@@ -106,6 +112,23 @@ io.sockets.on('connection', (socket) => {
         fs.writeFile("./static/arbreMCTS.json", MCTS, function (err) {
             if (err) return console.log(err);
             console.log('updateMCTS');
+    
+        });
+    })
+    socket.on("getMCTS2" ,()=>{
+        console.log("getMCTS")
+        fs.readFile("./static/arbreMCTS2.json", (err, data) => {
+            if (err) throw err;
+            let M = JSON.parse(data);
+            console.log("edit MCTS2")
+            socket.emit('MCTS2', M);
+        });
+    })
+
+    socket.on("updateMCTS2", (MCTS) =>{
+        fs.writeFile("./static/arbreMCTS2.json", MCTS, function (err) {
+            if (err) return console.log(err);
+            console.log('updateMCTS2');
     
         });
     })

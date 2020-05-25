@@ -93,7 +93,7 @@ var MCTS = {
 }
 socket.emit("getMCTS");
 var tabArbre = [];
-var Explo = 1;
+var Explo = 1.4;
 var arbre = MCTS;
 $.getJSON('http://192.168.2.97/arbreMCTS.json', function (data) {
     console.log(data[0])
@@ -441,7 +441,7 @@ function GameOver() {
     arbre = MCTS;
     logs.score = score;
     logs.lvl = lvl;
-
+    if(total%100==0)
     updateMCTS();
     /*if (score > 1000)
         socket.emit("json", logs);*/
