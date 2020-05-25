@@ -28,10 +28,10 @@ var d = new Date().getTime();
 var pause = false;
 var total = 0;
 var win = 0;
-var mangerInky =10000000;
-var mangerpinky =10000000;
-var mangerclyde =10000000;
-var mangerblinky =10000000;
+var mangerInky = 10000000;
+var mangerpinky = 10000000;
+var mangerclyde = 10000000;
+var mangerblinky = 10000000;
 var fantome = {
     blinky: {
         x: 13.5,
@@ -128,7 +128,6 @@ function resize() {
     taille = jeuH / 45 - ((jeuH / 45) % 2);
     document.getElementById('Game').width = taille * 28;
     document.getElementById('Game').height = taille * 44;
-    drawMap();
     drawinfo();
 }
 var tab =
@@ -205,49 +204,49 @@ for (var i = 0; i < 31; i++) {
 }
 
 function draw() {
-   
+
     if (!pause) {
-        if(timeTotal-FBleu==500){
+        if (timeTotal - FBleu == 500) {
             FantomeBleu = false;
             for (e in fantome)
                 fantome[e].vitesse = 0.07;
         }
-        if(timeTotal-Bchoix==15){
-            fantome.blinky.choix=false
+        if (timeTotal - Bchoix == 15) {
+            fantome.blinky.choix = false
         }
-        if(timeTotal-Cchoix==15){
-            fantome.clyde.choix=false
+        if (timeTotal - Cchoix == 15) {
+            fantome.clyde.choix = false
         }
-        if(timeTotal-Ichoix==15){
-            fantome.inky.choix=false
+        if (timeTotal - Ichoix == 15) {
+            fantome.inky.choix = false
         }
-        if(timeTotal-Pchoix==15){
-            fantome.pinky.choix=false
+        if (timeTotal - Pchoix == 15) {
+            fantome.pinky.choix = false
         }
-        if(timeTotal-SortiePinky ==150){
+        if (timeTotal - SortiePinky == 150) {
             fantome.pinky.x = 13.5;
             fantome.pinky.y = 11;
             fantome.pinky.direction = "gauche";
         }
-        if(timeTotal-mangerInky==500){
-            fantome.inky.x=13.5;
-            fantome.inky.y=11;
-            fantomeEat=200;
+        if (timeTotal - mangerInky == 500) {
+            fantome.inky.x = 13.5;
+            fantome.inky.y = 11;
+            fantomeEat = 200;
         }
-        if(timeTotal-mangerpinky==500){
-            fantome.pinky.x=13.5;
-            fantome.pinky.y=11;
-            fantomeEat=200;
+        if (timeTotal - mangerpinky == 500) {
+            fantome.pinky.x = 13.5;
+            fantome.pinky.y = 11;
+            fantomeEat = 200;
         }
-        if(timeTotal-mangerclyde==500){
-            fantome.clyde.x=13.5;
-            fantome.clyde.y=11;
-            fantomeEat=200;
+        if (timeTotal - mangerclyde == 500) {
+            fantome.clyde.x = 13.5;
+            fantome.clyde.y = 11;
+            fantomeEat = 200;
         }
-        if(timeTotal-mangerblinky==500){
-            fantome.blinky.x=13.5;
-            fantome.blinky.y=11;
-            fantomeEat=200;
+        if (timeTotal - mangerblinky == 500) {
+            fantome.blinky.x = 13.5;
+            fantome.blinky.y = 11;
+            fantomeEat = 200;
         }
         timeTotal++;
         if (timeTotal % 36 == 0) {
@@ -300,16 +299,16 @@ function draw() {
                     break;
                 default:
                     var t = Math.random();
-                    if(t>=0.75){
+                    if (t >= 0.75) {
                         gauche();
                         select = "g";
-                    }else if(t>=0.5){
+                    } else if (t >= 0.5) {
                         droite();
                         select = "d";
-                    }else if(t>=0.25){
+                    } else if (t >= 0.25) {
                         haut();
                         select = "h";
-                    }else{
+                    } else {
                         bas();
                         select = "b";
                     }
@@ -324,8 +323,6 @@ function draw() {
         drawEat();
         drawPacman();
         drawFantomes();
-        if (fruit)
-            drawFruit();
         if (score > 10000 && !up) {
             life++
             up = true;
@@ -333,14 +330,7 @@ function draw() {
     }
 
 }
-function drawFruit() {
-    ctx.beginPath();
-    ctx.arc(14 * taille, 25.5 * taille, taille / 1.5, 0, Math.PI * 2);
-    ctx.fillStyle = "#cd5757";
-    ctx.fill();
-    ctx.closePath();
-}
-var FBleu =10000000;
+var FBleu = 10000000;
 function bleu() {
     for (f in fantome)
         fantome[f].vitesse = 0.035;
@@ -349,8 +339,8 @@ function bleu() {
 
     mode = "scatter"
     FBleu = timeTotal;
-   
-        
+
+
 }
 function tempo(t) {
     if (t == 700) {
@@ -436,7 +426,7 @@ function drawFantomes() {
                     choixDirection(f);
                 break;
         }
-      
+
         if (Math.round(fantome[f].x) == Math.round(pacman.x) && Math.round(fantome[f].y) == Math.round(pacman.y)) {
             if (FantomeBleu) {
                 fantome[f].x = 13.5;
@@ -444,17 +434,17 @@ function drawFantomes() {
                 score += fantomeEat;
                 fantomeEat += fantomeEat;
                 var r = f;
-                switch (r){
-                    case "blinky":mangerblinky=timeTotal;
-                    break;
-                    case "pinky":mangerpinky=timeTotal;
-                    break;
-                    case "inky":mangerInky=timeTotal;
-                    break;
-                    case "clyde":mangerclyde=timeTotal;
-                    break;
+                switch (r) {
+                    case "blinky": mangerblinky = timeTotal;
+                        break;
+                    case "pinky": mangerpinky = timeTotal;
+                        break;
+                    case "inky": mangerInky = timeTotal;
+                        break;
+                    case "clyde": mangerclyde = timeTotal;
+                        break;
                 }
-               
+
             } else {
                 life -= 1;
 
@@ -466,20 +456,12 @@ function drawFantomes() {
             }
 
         }
-
-        ctx.beginPath();
-        ctx.arc(fantome[f].x * taille + taille / 2, fantome[f].y * taille + taille / 2 + 8 * taille, taille / 1.8, 0, Math.PI * 2);
-        if (!FantomeBleu)
-            ctx.fillStyle = fantome[f].couleur;
-        else
-            ctx.fillStyle = "#0000ff";
-        ctx.fill();
-        ctx.closePath();
     }
 }
 
 function GameOver() {
-    console.log(score)
+    if(total%100==0)
+    console.log(highscore +" "+total)
     var w = 0;
     if (ptsEat > 0)
         w = Math.round((score * 1000) / 5800) / 1000
@@ -494,12 +476,12 @@ function GameOver() {
     timeTotal = 0;
     arbre = MCTS;
 
-    fantome.blinky.choix=false;
-    fantome.clyde.choix=false;
-    fantome.inky.choix=false;
-    fantome.pinky.choix=false;
-    if(total%100==0)
-    updateMCTS();
+    fantome.blinky.choix = false;
+    fantome.clyde.choix = false;
+    fantome.inky.choix = false;
+    fantome.pinky.choix = false;
+    if (total % 10000 == 0)
+        updateMCTS();
 
     d = new Date().getTime();
     nextLvl();
@@ -508,7 +490,7 @@ function GameOver() {
     score = 0;
 
 }
-async function updateMCTS() {
+ function updateMCTS() {
     socket.emit("updateMCTS2", JSON.stringify(MCTS))
 }
 
@@ -525,7 +507,7 @@ function choixDirection(name) {
                 else if (mode == "scatter")
                     cible = [26, -2];
                 break;
-            case "pinky":             
+            case "pinky":
                 Pchoix = timeTotal;
                 if (mode == "chasse") {
                     cible = [Math.round(pacman.x), Math.round(pacman.y)];
@@ -643,11 +625,6 @@ function drawPacman() {
         eat(50);
         bleu();
     }
-    ctx.beginPath();
-    ctx.arc(pacman.x * taille + taille / 2, pacman.y * taille + taille / 2 + 8 * taille, taille / 1.8, 0, Math.PI * 2);
-    ctx.fillStyle = "#FFFF00";
-    ctx.fill();
-    ctx.closePath();
 }
 function eat(nb) {
     score += nb;
@@ -663,7 +640,7 @@ function eat(nb) {
 
         }
         total += 1;
-        win +=  Math.round((score * 1000) / 5800) / 1000
+        win += Math.round((score * 1000) / 5800) / 1000
         tabArbre = [];
         timeTotal = 0;
         arbre = MCTS;
@@ -684,7 +661,6 @@ function eat(nb) {
         fantome.clyde.x = 13.5;
         fantome.clyde.y = 11;
     }
-    drawinfo();
 }
 function nextLvl() {
 
@@ -702,7 +678,7 @@ function nextLvl() {
         }
     }
 }
-var SortiePinky =10000000;
+var SortiePinky = 10000000;
 function repositionne() {
     time = 0;
     mode = "scatter"
@@ -723,10 +699,10 @@ function repositionne() {
     fantome.clyde.y = 14;
     fantome.clyde.direction = "gauche";
     SortiePinky = timeTotal;
-   
+
 
 }
-function drawinfo() {
+async function drawinfo() {
     ctx.beginPath();
     ctx.rect(0, 0, taille * 28, taille * 8);
     ctx.fillStyle = "#111111";
@@ -770,109 +746,13 @@ function directionPacman() {
     }
 }
 function drawEat() {
-    for (var i = 0; i < 28; i++) {
-        for (var j = 0; j < 31; j++) {
-            switch (tabEat[j][i]) {
-                case '1'://horizontal
-                    ctx.beginPath();
-                    ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
-                    ctx.fillStyle = "#111111";
-                    ctx.fill();
-                    ctx.closePath();
-                    ctx.beginPath();
-                    ctx.arc(i * taille + taille / 2, j * taille + taille / 2 + 8 * taille, taille / 6, 0, Math.PI * 2);
-                    ctx.fillStyle = "#FFFF00";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                case '2': //angle bas-droit
-                    ctx.beginPath();
-                    ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
-                    ctx.fillStyle = "#111111";
-                    ctx.fill();
-                    ctx.closePath();
-                    ctx.beginPath();
-                    ctx.arc(i * taille + taille / 2, j * taille + taille / 2 + 8 * taille, taille / 4, 0, Math.PI * 2);
-                    ctx.fillStyle = "#f6f6f6";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                case '3': //angle bas-droit
-                    ctx.beginPath();
-                    ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
-                    ctx.fillStyle = "#111111";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-            }
-        }
-    }
+
     if (fruit && Math.round(pacman.y) == 17 && Math.round(pacman.x * 2) == 27) {
         fruit = false;
         score += 100;
     }
 }
-function drawMap() {
-    for (var i = 0; i < 28; i++) {
-        for (var j = 0; j < 31; j++) {
-            switch (tab[j][i]) {
-                case '0'://vertical
-                    ctx.beginPath();
-                    ctx.rect(i * taille + taille / 4, j * taille + 8 * taille, taille / 2, taille);
-                    ctx.fillStyle = "#0002ff";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                case '1'://horizontal
-                    ctx.beginPath();
-                    ctx.rect(i * taille, j * taille + taille / 4 + 8 * taille, taille, taille / 2);
-                    ctx.fillStyle = "#0002ff";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                case '2': //angle bas-droit
-                    ctx.beginPath();
-                    ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille / 2, taille * (3 / 4));
-                    ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
-                    ctx.fillStyle = "#0002ff";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                case '3': //angle droit-haut
-                    ctx.beginPath();
-                    ctx.rect(i * taille + taille / 4, j * taille + 8 * taille, taille / 2, taille * (3 / 4));
-                    ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
-                    ctx.fillStyle = "#0002ff";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                case '4': //angle haut-gauche
-                    ctx.beginPath();
-                    ctx.rect(i * taille + taille / 4, j * taille + 8 * taille, taille / 2, taille * (3 / 4));
-                    ctx.rect(i * taille, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
-                    ctx.fillStyle = "#0002ff";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                case '5': //angle gauche-bas
-                    ctx.beginPath();
-                    ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille / 2, taille * (3 / 4));
-                    ctx.rect(i * taille, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
-                    ctx.fillStyle = "#0002ff";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                default:
-                    ctx.beginPath();
-                    ctx.rect(i * taille, j * taille + 8 * taille, taille, taille);
-                    ctx.fillStyle = "#000000";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-            }
-        }
-    }
-}
+
 document.addEventListener("keydown", keyDownHandler, false);
 function keyDownHandler(e) {
     if (e.key == "d" || e.key == "ArrowRight") {
@@ -920,7 +800,7 @@ function bas() {
 resize();
 repositionne();
 setTimeout(() => {
-    while(true){
+    while (true) {
         draw();
     }
 }, 1000);
