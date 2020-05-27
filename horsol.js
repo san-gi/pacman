@@ -27,6 +27,7 @@ var time = 0;
 var score = 0;
 var ptsEat = 0;
 var highscore = 0;
+var higheat = 0;
 var fruit = false;
 var life = 1;
 var lvl = 1;
@@ -82,43 +83,40 @@ var fantome = {
 }
 
 var timeTotal = 0;
+var MCTS;
+/*fs.readFile('./static/arbreMCTS2.json', function (err, data) {
+    if (err) throw err;
+    MCTS = JSON.parse(data);
+    arbre = MCTS;
+});*/
+
 var MCTS = {
-    total: 0,
-    win: 0,
-    "36d": {
-        total: 0,
-        win: 0,
+    t: 0,
+    w: 0,
+    "1d": {
+        t: 0,
+        w: 0,
     },
-    "36g": {
-        total: 0,
-        win: 0,
+    "1g": {
+        t: 0,
+        w: 0,
     },
-    "36h": {
-        total: 0,
-        win: 0,
-    },
-    "36b": {
-        total: 0,
-        win: 0,
+    "1h": {
+        t: 0,
+        w: 0,
     }
 }
+var win2 = 0;
+var total2 = 0;
 var tabArbre = [];
-var Explo = 1.4;
+var Explo = 0.1;
 var arbre = MCTS;
+console.log(MCTS)
 var Bchoix = 10000000;
 var Cchoix = 10000000;
 var Ichoix = 10000000;
 var Pchoix = 10000000;
-$.getJSON('http://192.168.2.97/arbreMCTS2.json', function (data) {
-    console.log(data[0])
-    if (data.total != undefined) {
-        total = data.total
-        win = data.win
-        MCTS = data;
-        arbre = MCTS;
-        console.log("useArbreJson")
-    }
-});
+
 
 
 window.onresize = function () {
@@ -255,40 +253,45 @@ function draw() {
         fantomeEat = 200;
     }
     timeTotal++;
-    if (timeTotal % 36 == 0) {
+    if (timeTotal % 25 == 0) {
         tabArbre.push(arbre);
-        if (arbre.total == 0) {
-            arbre[timeTotal + "d"] = {
-                win: 0,
-                total: 0,
-            };
-            arbre[timeTotal + "g"] = {
-                win: 0,
-                total: 0,
-            };
-            arbre[timeTotal + "h"] = {
-                win: 0,
-                total: 0,
-            };
-            arbre[timeTotal + "b"] = {
-                win: 0,
-                total: 0,
-            };
+        try {
+            if (arbre.t == 0) {
+                arbre[(timeTotal / 25) + "d"] = {
+                    w: 0,
+                    t: 0,
+                };
+                arbre[(timeTotal / 25) + "g"] = {
+                    w: 0,
+                    t: 0,
+                };
+                arbre[(timeTotal / 25) + "h"] = {
+                    w: 0,
+                    t: 0,
+                };
+                arbre[(timeTotal / 25) + "b"] = {
+                    w: 0,
+                    t: 0,
+                };
+            }
+        } catch (error) {
+            
         }
+        
         var select = "";
         var selectN = 0;
         for (choix in arbre) {
-            if (choix != "win" && choix != "total") {
+            if (choix != "w" && choix != "t" && choix !="z" ) {
 
                 var c = choix[choix.length - 1]
-                if (arbre[timeTotal + c].total > 0) {
-                    if (arbre[timeTotal + c].win / arbre[timeTotal + c].total + Explo * Math.sqrt(Math.log(arbre.total) / arbre[timeTotal + c].total) > selectN) {
-                        selectN = arbre[timeTotal + c].win / arbre[timeTotal + c].total + Explo * Math.sqrt(Math.log(arbre.total) / arbre[timeTotal + c].total);
+                if (arbre[(timeTotal / 25) + c].t > 0) {
+                    if (arbre[(timeTotal / 25) + c].w / arbre[(timeTotal / 25) + c].t + Explo * Math.sqrt(Math.log(arbre.t) / arbre[(timeTotal / 25) + c].t) > selectN) {
+                        selectN = arbre[(timeTotal / 25) + c].w / arbre[(timeTotal / 25) + c].t + Explo * Math.sqrt(Math.log(arbre.t) / arbre[(timeTotal / 25) + c].t);
                         select = c;
                     }
                 } else {
-                    if (Explo * Math.sqrt(Math.log(arbre.total)) > selectN) {
-                        selectN = Explo * Math.sqrt(Math.log(arbre.total));
+                    if (Explo * Math.sqrt(Math.log(arbre.t)) > selectN) {
+                        selectN = Explo * Math.sqrt(Math.log(arbre.t));
                         select = c;
                     }
                 }
@@ -318,8 +321,21 @@ function draw() {
                     bas();
                     select = "b";
                 }
+        }try {
+            arbre = arbre[(timeTotal / 25) + select];
+        } catch (error) {
+            GameOver()
         }
-        arbre = arbre[timeTotal + select];
+        
+
+
+
+
+
+
+
+
+
     }
 
     if (!FantomeBleu) {
@@ -329,10 +345,7 @@ function draw() {
     drawEat();
     drawPacman();
     drawFantomes();
-    if (score > 10000 && !up) {
-        life++
-        up = true;
-    }
+
 }
 
 
@@ -465,19 +478,58 @@ function drawFantomes() {
 }
 
 function GameOver() {
-    pause = true
-    if (total % 100 == 0)
-        console.log(highscore + " " + total)
+    fantomeEat=200;
+    mangerInky = 10000000;
+    mangerpinky = 10000000;
+    mangerclyde = 10000000;
+    mangerblinky = 10000000;
+    Bchoix = 10000000;
+    Cchoix = 10000000;
+    Ichoix = 10000000;
+    Pchoix = 10000000;
+    FBleu = 10000000;
+    SortiePinky = 10000000;
+
+    if (total % 1000 == 0) {
+        console.log(highscore + " " + higheat + " " + total + " " + win2 /total2 + " " + win/ total)
+        win2 = 0;
+        total2 = 0;
+    }
+
     var w = 0;
-    if (ptsEat > 0)
-        w = Math.round((score * 1000) / 5800) / 1000
+
+    if (ptsEat ==2600)
+        w = Math.round((score * 100) / 14800) / 100
+
     for (var i = 0; i < tabArbre.length; i++) {
-        tabArbre[i].total += 1;
-        tabArbre[i].win += w
+        try {
+            tabArbre[i].t += 1;
+            tabArbre[i].w = Math.round((tabArbre[i].w + w) * 100) / 100
+        } catch (error) {
+            
+        }
+       
+    }
+    var nb =0;
+    for(obj in tabArbre[tabArbre.length-1]){
+        
+        if(tabArbre[tabArbre.length-1][obj].t==0){
+            nb++;
+        }
+    }
+    if(nb==4){
+        for(obj in tabArbre[tabArbre.length-1]){
+            if(obj !="w" && obj != "t"){
+               delete tabArbre[tabArbre.length-1][obj];
+            }
+        }
+        
     }
     fruit = false;
-    win += w;
+    win = Math.round((win + w) * 100) / 100;
+    win2 += w;
     total += 1;
+    total2 += 1;
     tabArbre = [];
     timeTotal = 0;
     arbre = MCTS;
@@ -486,8 +538,11 @@ function GameOver() {
     fantome.clyde.choix = false;
     fantome.inky.choix = false;
     fantome.pinky.choix = false;
-    if (total % 1 == 0)
+    if (total % 100000 == 0) {
+        pause = true
         updateMCTS();
+    }
+
 
     d = new Date().getTime();
     nextLvl();
@@ -497,16 +552,32 @@ function GameOver() {
 
 }
 function updateMCTS() {
-    console.log("testup")
-    console.log(MCTS)
-    fs.writeFile("./static/arbreMCTS2.json", JSON.stringify(MCTS), function (err) {
+    var e = {
+        total: MCTS.t,
+        win: MCTS.w
+    }
+
+    fs.writeFile("./static/arbre2/arbreMCTS2head.json", JSON.stringify(e), function (err) {
         if (err) return console.log(err);
-        console.log('updateMCTS2');
-        pause = false;
-        while (!pause) {
-            draw();
-        }
+        console.log('updateMCTS2header');
+        fs.writeFile("./static/arbre2/arbreMCTS2d.json", JSON.stringify(MCTS["1d"]), function (err) {
+            if (err) return console.log(err);
+            console.log('updateMCTS2d');
+            fs.writeFile("./static/arbre2/arbreMCTS2g.json", JSON.stringify(MCTS["1g"]), function (err) {
+                if (err) return console.log(err);
+                console.log('updateMCTS2g');
+                fs.writeFile("./static/arbre2/arbreMCTS2h.json", JSON.stringify(MCTS["1h"]), function (err) {
+                    if (err) return console.log(err);
+                    console.log('updateMCTS2h');
+                    pause = false;
+                    while (!pause) {
+                        draw();
+                    }
+                });
+            });
+        });
     });
+
 }
 
 function choixDirection(name) {
@@ -648,20 +719,12 @@ function eat(nb) {
         fruit = true;
     if (score > highscore)
         highscore = score;
+    
+       
+    if (ptsEat > higheat)
+        higheat = ptsEat
     if (ptsEat == 2600) {
-        for (var i = 0; i < tabArbre.length; i++) {
-            tabArbre[i].total += 1;
-            tabArbre[i].win += Math.round((score * 1000) / 5800) / 1000;
-
-        }
-        total += 1;
-        win += Math.round((score * 1000) / 5800) / 1000
-        tabArbre = [];
-        timeTotal = 0;
-        arbre = MCTS;
-        updateMCTS();
-        nextLvl();
-
+        GameOver()
     }
 
     if (ptsEat >= 300 && !fantome.inky.sortie) {

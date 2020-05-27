@@ -73,24 +73,21 @@ var fantome = {
 
 var timeTotal = 0;
 var MCTS = {
-    total: 0,
-    win: 0,
-    "36d": {
+    t: 0,
+    w: 0,
+    "25d": {
         total: 0,
-        win: 0,
+        w: 0,
     },
-    "36g": {
+    "25g": {
         total: 0,
-        win: 0,
+        w: 0,
     },
-    "36h": {
+    "25h": {
         total: 0,
-        win: 0,
-    },
-    "36b": {
-        total: 0,
-        win: 0,
+        w: 0,
     }
+
 }
 socket.emit("getMCTS2");
 var tabArbre = [];
@@ -100,11 +97,12 @@ var Bchoix = 10000000;
 var Cchoix = 10000000;
 var Ichoix = 10000000;
 var Pchoix = 10000000;
+var select = "h";
 $.getJSON('http://192.168.2.97/arbreMCTS2.json', function (data) {
     console.log(data[0])
     if (data.total != undefined) {
-        total = data.total
-        win = data.win
+        total = data.t
+        win = data.w
         MCTS = data;
         arbre = MCTS;
         console.log("useArbreJson")
@@ -128,6 +126,9 @@ function resize() {
     taille = jeuH / 45 - ((jeuH / 45) % 2);
     document.getElementById('Game').width = taille * 28;
     document.getElementById('Game').height = taille * 44;
+    document.getElementById('info').style = "height:" + taille * 44 + "px; width:" + taille * 28 + "px;";
+    document.getElementById('dir').style = "height:" + taille * 34 + "px;overflow:scroll;";
+    drawMap();
     drawinfo();
 }
 var tab =
@@ -204,90 +205,99 @@ for (var i = 0; i < 31; i++) {
 }
 
 function draw() {
+    if (timeTotal - FBleu == 500) {
+        FantomeBleu = false;
+        for (e in fantome)
+            fantome[e].vitesse = 0.07;
+    }
+    if (timeTotal - Bchoix == 15) {
+        fantome.blinky.choix = false
+    }
+    if (timeTotal - Cchoix == 15) {
+        fantome.clyde.choix = false
+    }
+    if (timeTotal - Ichoix == 15) {
+        fantome.inky.choix = false
+    }
+    if (timeTotal - Pchoix == 15) {
+        fantome.pinky.choix = false
+    }
+    if (timeTotal - SortiePinky == 150) {
+        fantome.pinky.x = 13.5;
+        fantome.pinky.y = 11;
+        fantome.pinky.direction = "gauche";
+    }
+    if (timeTotal - mangerInky == 500) {
+        fantome.inky.x = 13.5;
+        fantome.inky.y = 11;
+        fantomeEat = 200;
+    }
+    if (timeTotal - mangerpinky == 500) {
+        fantome.pinky.x = 13.5;
+        fantome.pinky.y = 11;
+        fantomeEat = 200;
+    }
+    if (timeTotal - mangerclyde == 500) {
+        fantome.clyde.x = 13.5;
+        fantome.clyde.y = 11;
+        fantomeEat = 200;
+    }
+    if (timeTotal - mangerblinky == 500) {
+        fantome.blinky.x = 13.5;
+        fantome.blinky.y = 11;
+        fantomeEat = 200;
+    }
+
+
+
+
+
+
+
+
+
 
     if (!pause) {
-        if (timeTotal - FBleu == 500) {
-            FantomeBleu = false;
-            for (e in fantome)
-                fantome[e].vitesse = 0.07;
-        }
-        if (timeTotal - Bchoix == 15) {
-            fantome.blinky.choix = false
-        }
-        if (timeTotal - Cchoix == 15) {
-            fantome.clyde.choix = false
-        }
-        if (timeTotal - Ichoix == 15) {
-            fantome.inky.choix = false
-        }
-        if (timeTotal - Pchoix == 15) {
-            fantome.pinky.choix = false
-        }
-        if (timeTotal - SortiePinky == 150) {
-            fantome.pinky.x = 13.5;
-            fantome.pinky.y = 11;
-            fantome.pinky.direction = "gauche";
-        }
-        if (timeTotal - mangerInky == 500) {
-            fantome.inky.x = 13.5;
-            fantome.inky.y = 11;
-            fantomeEat = 200;
-        }
-        if (timeTotal - mangerpinky == 500) {
-            fantome.pinky.x = 13.5;
-            fantome.pinky.y = 11;
-            fantomeEat = 200;
-        }
-        if (timeTotal - mangerclyde == 500) {
-            fantome.clyde.x = 13.5;
-            fantome.clyde.y = 11;
-            fantomeEat = 200;
-        }
-        if (timeTotal - mangerblinky == 500) {
-            fantome.blinky.x = 13.5;
-            fantome.blinky.y = 11;
-            fantomeEat = 200;
-        }
         timeTotal++;
-        if (timeTotal % 36 == 0) {
+        if (timeTotal % 25 == 0) {
             tabArbre.push(arbre);
-            if (arbre.total == 0) {
-                arbre[timeTotal + "d"] = {
-                    win: 0,
-                    total: 0,
+            if (arbre.t == 0) {
+                arbre[(timeTotal / 25) + "d"] = {
+                    w: 0,
+                    t: 0,
                 };
-                arbre[timeTotal + "g"] = {
-                    win: 0,
-                    total: 0,
+                arbre[(timeTotal / 25) + "g"] = {
+                    w: 0,
+                    t: 0,
                 };
-                arbre[timeTotal + "h"] = {
-                    win: 0,
-                    total: 0,
+                arbre[(timeTotal / 25) + "h"] = {
+                    w: 0,
+                    t: 0,
                 };
-                arbre[timeTotal + "b"] = {
-                    win: 0,
-                    total: 0,
+                arbre[(timeTotal / 25) + "b"] = {
+                    w: 0,
+                    t: 0,
                 };
             }
-            var select = "";
+            //select = "";
             var selectN = 0;
-            for (choix in arbre) {
-                if (choix != "win" && choix != "total") {
-
-                    var c = choix[choix.length - 1]
-                    if (arbre[timeTotal + c].total > 0) {
-                        if (arbre[timeTotal + c].win / arbre[timeTotal + c].total + Explo * Math.sqrt(Math.log(arbre.total) / arbre[timeTotal + c].total) > selectN) {
-                            selectN = arbre[timeTotal + c].win / arbre[timeTotal + c].total + Explo * Math.sqrt(Math.log(arbre.total) / arbre[timeTotal + c].total);
-                            select = c;
-                        }
-                    } else {
-                        if (Explo * Math.sqrt(Math.log(arbre.total)) > selectN) {
-                            selectN = Explo * Math.sqrt(Math.log(arbre.total));
-                            select = c;
-                        }
-                    }
-                }
-            }
+            /* for (choix in arbre) {
+                 if (choix != "w" && choix != "t") {
+ 
+                     var c = choix[choix.length - 1]
+                     if (arbre[timeTotal + c].t > 0) {
+                         if (arbre[timeTotal + c].w / arbre[timeTotal + c].t + Explo * Math.sqrt(Math.log(arbre.t) / arbre[timeTotal + c].t) > selectN) {
+                             selectN = arbre[timeTotal + c].w / arbre[timeTotal + c].t + Explo * Math.sqrt(Math.log(arbre.t) / arbre[timeTotal + c].t);
+                             select = c;
+                         }
+                     } else {
+                         if (Explo * Math.sqrt(Math.log(arbre.t)) > selectN) {
+                             selectN = Explo * Math.sqrt(Math.log(arbre.t));
+                             select = c;
+                         }
+                     }
+                 }
+             }*/
             switch (select) {
                 case "g": gauche();
                     break;
@@ -301,19 +311,24 @@ function draw() {
                     var t = Math.random();
                     if (t >= 0.75) {
                         gauche();
-                        select = "g";
+                        //select = "g";
                     } else if (t >= 0.5) {
                         droite();
-                        select = "d";
+                        //select = "d";
                     } else if (t >= 0.25) {
                         haut();
-                        select = "h";
+                        //select = "h";
                     } else {
                         bas();
-                        select = "b";
+                        //select = "b";
                     }
             }
-            arbre = arbre[timeTotal + select];
+            arbre = arbre[(timeTotal / 25) + select];
+            if (arbre.t > 0)
+                $("#dir").html($("#dir").html() + `<div  class="d-flex justify-content-around"><div class=" bg-secondary">${Math.round((arbre[((timeTotal + 25) / 25) + "h"].w/arbre[((timeTotal + 25) / 25) + "h"].t)*100/100)}</div><div  class=" bg-secondary">${Math.round((arbre[((timeTotal + 25) / 25) + "b"].w/arbre[((timeTotal + 25) / 25) + "b"].t)*100)/100}</div><div class="bg-secondary">${Math.round((arbre[((timeTotal + 25) / 25) + "g"].w/arbre[((timeTotal + 25) / 25) + "g"].t)*100)/100}</div><div class="bg-secondary">${Math.round((arbre[((timeTotal + 25) / 25) + "d"].w/arbre[((timeTotal + 25) / 25) + "d"].t*100)/100)}</div></div>`);
+            else
+                $("#dir").html(`<div><button type="button"  class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button></div>`);
+            $("#dir").scrollTop(1000000)
         }
 
         if (!FantomeBleu) {
@@ -323,12 +338,22 @@ function draw() {
         drawEat();
         drawPacman();
         drawFantomes();
+        if (fruit)
+            drawFruit();
         if (score > 10000 && !up) {
             life++
             up = true;
         }
+
     }
 
+}
+function drawFruit() {
+    ctx.beginPath();
+    ctx.arc(14 * taille, 25.5 * taille, taille / 1.5, 0, Math.PI * 2);
+    ctx.fillStyle = "#cd5757";
+    ctx.fill();
+    ctx.closePath();
 }
 var FBleu = 10000000;
 function bleu() {
@@ -456,19 +481,39 @@ function drawFantomes() {
             }
 
         }
+
+        ctx.beginPath();
+        ctx.arc(fantome[f].x * taille + taille / 2, fantome[f].y * taille + taille / 2 + 8 * taille, taille / 1.8, 0, Math.PI * 2);
+        if (!FantomeBleu)
+            ctx.fillStyle = fantome[f].couleur;
+        else
+            ctx.fillStyle = "#0000ff";
+        ctx.fill();
+        ctx.closePath();
     }
 }
 
 function GameOver() {
-    if(total%100==0)
-    console.log(highscore +" "+total)
+    mangerInky = 10000000;
+    mangerpinky = 10000000;
+    mangerclyde = 10000000;
+    mangerblinky = 10000000;
+    Bchoix = 10000000;
+    Cchoix = 10000000;
+    Ichoix = 10000000;
+    Pchoix = 10000000;
+    FBleu = 10000000;
+    SortiePinky = 10000000;
+    $("#dir").html("");
     var w = 0;
     if (ptsEat > 0)
-        w = Math.round((score * 1000) / 5800) / 1000
-    for (var i = 0; i < tabArbre.length; i++) {
-        tabArbre[i].total += 1;
-        tabArbre[i].win += w
-    }
+        w = Math.round((score * 1000) / 14800) / 1000
+        if(tabArbre[tabArbre.length].t===0)
+        for (var i = 0; i < tabArbre.length; i++) {
+            tabArbre[i].t += 1;
+            //tabArbre[i].w += w
+            tabArbre[i].w = Math.round((tabArbre[i].w + w) * 100) / 100
+        }
     fruit = false;
     win += w;
     total += 1;
@@ -480,8 +525,7 @@ function GameOver() {
     fantome.clyde.choix = false;
     fantome.inky.choix = false;
     fantome.pinky.choix = false;
-    if (total % 10000 == 0)
-        updateMCTS();
+    updateMCTS();
 
     d = new Date().getTime();
     nextLvl();
@@ -490,7 +534,7 @@ function GameOver() {
     score = 0;
 
 }
- function updateMCTS() {
+async function updateMCTS() {
     socket.emit("updateMCTS2", JSON.stringify(MCTS))
 }
 
@@ -625,6 +669,11 @@ function drawPacman() {
         eat(50);
         bleu();
     }
+    ctx.beginPath();
+    ctx.arc(pacman.x * taille + taille / 2, pacman.y * taille + taille / 2 + 8 * taille, taille / 1.8, 0, Math.PI * 2);
+    ctx.fillStyle = "#FFFF00";
+    ctx.fill();
+    ctx.closePath();
 }
 function eat(nb) {
     score += nb;
@@ -634,18 +683,7 @@ function eat(nb) {
     if (score > highscore)
         highscore = score;
     if (ptsEat == 2600) {
-        for (var i = 0; i < tabArbre.length; i++) {
-            tabArbre[i].total += 1;
-            tabArbre[i].win += Math.round((score * 1000) / 5800) / 1000;
-
-        }
-        total += 1;
-        win += Math.round((score * 1000) / 5800) / 1000
-        tabArbre = [];
-        timeTotal = 0;
-        arbre = MCTS;
-        socket.emit("updateMCTS2", JSON.stringify(MCTS))
-        nextLvl();
+        GameOver();
 
     }
 
@@ -661,6 +699,7 @@ function eat(nb) {
         fantome.clyde.x = 13.5;
         fantome.clyde.y = 11;
     }
+    drawinfo();
 }
 function nextLvl() {
 
@@ -702,7 +741,7 @@ function repositionne() {
 
 
 }
-async function drawinfo() {
+function drawinfo() {
     ctx.beginPath();
     ctx.rect(0, 0, taille * 28, taille * 8);
     ctx.fillStyle = "#111111";
@@ -746,28 +785,129 @@ function directionPacman() {
     }
 }
 function drawEat() {
-
+    for (var i = 0; i < 28; i++) {
+        for (var j = 0; j < 31; j++) {
+            switch (tabEat[j][i]) {
+                case '1'://horizontal
+                    ctx.beginPath();
+                    ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
+                    ctx.fillStyle = "#111111";
+                    ctx.fill();
+                    ctx.closePath();
+                    ctx.beginPath();
+                    ctx.arc(i * taille + taille / 2, j * taille + taille / 2 + 8 * taille, taille / 6, 0, Math.PI * 2);
+                    ctx.fillStyle = "#FFFF00";
+                    ctx.fill();
+                    ctx.closePath();
+                    break;
+                case '2': //angle bas-droit
+                    ctx.beginPath();
+                    ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
+                    ctx.fillStyle = "#111111";
+                    ctx.fill();
+                    ctx.closePath();
+                    ctx.beginPath();
+                    ctx.arc(i * taille + taille / 2, j * taille + taille / 2 + 8 * taille, taille / 4, 0, Math.PI * 2);
+                    ctx.fillStyle = "#f6f6f6";
+                    ctx.fill();
+                    ctx.closePath();
+                    break;
+                case '3': //angle bas-droit
+                    ctx.beginPath();
+                    ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
+                    ctx.fillStyle = "#111111";
+                    ctx.fill();
+                    ctx.closePath();
+                    break;
+            }
+        }
+    }
     if (fruit && Math.round(pacman.y) == 17 && Math.round(pacman.x * 2) == 27) {
         fruit = false;
         score += 100;
     }
 }
-
+function drawMap() {
+    for (var i = 0; i < 28; i++) {
+        for (var j = 0; j < 31; j++) {
+            switch (tab[j][i]) {
+                case '0'://vertical
+                    ctx.beginPath();
+                    ctx.rect(i * taille + taille / 4, j * taille + 8 * taille, taille / 2, taille);
+                    ctx.fillStyle = "#0002ff";
+                    ctx.fill();
+                    ctx.closePath();
+                    break;
+                case '1'://horizontal
+                    ctx.beginPath();
+                    ctx.rect(i * taille, j * taille + taille / 4 + 8 * taille, taille, taille / 2);
+                    ctx.fillStyle = "#0002ff";
+                    ctx.fill();
+                    ctx.closePath();
+                    break;
+                case '2': //angle bas-droit
+                    ctx.beginPath();
+                    ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille / 2, taille * (3 / 4));
+                    ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
+                    ctx.fillStyle = "#0002ff";
+                    ctx.fill();
+                    ctx.closePath();
+                    break;
+                case '3': //angle droit-haut
+                    ctx.beginPath();
+                    ctx.rect(i * taille + taille / 4, j * taille + 8 * taille, taille / 2, taille * (3 / 4));
+                    ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
+                    ctx.fillStyle = "#0002ff";
+                    ctx.fill();
+                    ctx.closePath();
+                    break;
+                case '4': //angle haut-gauche
+                    ctx.beginPath();
+                    ctx.rect(i * taille + taille / 4, j * taille + 8 * taille, taille / 2, taille * (3 / 4));
+                    ctx.rect(i * taille, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
+                    ctx.fillStyle = "#0002ff";
+                    ctx.fill();
+                    ctx.closePath();
+                    break;
+                case '5': //angle gauche-bas
+                    ctx.beginPath();
+                    ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille / 2, taille * (3 / 4));
+                    ctx.rect(i * taille, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
+                    ctx.fillStyle = "#0002ff";
+                    ctx.fill();
+                    ctx.closePath();
+                    break;
+                default:
+                    ctx.beginPath();
+                    ctx.rect(i * taille, j * taille + 8 * taille, taille, taille);
+                    ctx.fillStyle = "#000000";
+                    ctx.fill();
+                    ctx.closePath();
+                    break;
+            }
+        }
+    }
+}
 document.addEventListener("keydown", keyDownHandler, false);
 function keyDownHandler(e) {
     if (e.key == "d" || e.key == "ArrowRight") {
-        droite();
+        //droite();
+        select = "d"
+
     }
     else if (e.key == "q" || e.key == "a" || e.key == "ArrowLeft") {
-        gauche();
+        //gauche();
+        select = "g"
 
     }
     else if (e.key == "z" || e.key == "w" || e.key == "ArrowUp") {
-        haut();
+        //haut();
+        select = "h"
 
     }
     else if (e.key == "s" || e.key == "ArrowDown") {
-        bas();
+        //bas();
+        select = "b"
 
     } else if (e.key == " ") {
         pause = !pause;
@@ -800,7 +940,5 @@ function bas() {
 resize();
 repositionne();
 setTimeout(() => {
-    while (true) {
-        draw();
-    }
+    setInterval(function () { draw(); }, 10);
 }, 1000);
