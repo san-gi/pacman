@@ -11,7 +11,7 @@ app.get('', (req, res) => {
     res.sendFile(__dirname + '/static/refactor.html');
 });
 
-var jeuW;
+
 var jeuH;
 var taille;
 var pacman = {
@@ -21,8 +21,6 @@ var pacman = {
     direction: null,
     directionSuivante: null
 }
-var up = false;
-var action = "";
 var time = 0;
 var score = 0;
 var ptsEat = 0;
@@ -34,8 +32,6 @@ var lvl = 1;
 var mode = "scatter";
 var FantomeBleu = false;
 var fantomeEat = 200;
-
-var d = new Date().getTime();
 var pause = false;
 var total = 0;
 var win = 0;
@@ -50,7 +46,6 @@ var fantome = {
         couleur: "#FF0000",
         direction: "gauche",
         vitesse: 0.07,
-        sortie: true,
         choix: false,
     },
     pinky: {
@@ -59,7 +54,6 @@ var fantome = {
         couleur: "#FF00FF",
         direction: "gauche",
         vitesse: 0.07,
-        sortie: false,
         choix: false,
     },
     inky: {
@@ -109,29 +103,17 @@ var MCTS = {
 var win2 = 0;
 var total2 = 0;
 var tabArbre = [];
-var Explo = 0.1;
+var Explo = 0.3;
 var arbre = MCTS;
 console.log(MCTS)
 var Bchoix = 10000000;
 var Cchoix = 10000000;
 var Ichoix = 10000000;
 var Pchoix = 10000000;
-
-
-
-window.onresize = function () {
-    this.resize();
-}
-
 function resize() {
     var h = 1000;
-    var w = 1000;
     ratio = 280 / 450;
-
-    jeuW = (h - 240) * (280 / 450)
-
     jeuH = (h - 240);
-
     taille = jeuH / 45 - ((jeuH / 45) % 2);
 }
 var tab =
@@ -326,18 +308,7 @@ function draw() {
         } catch (error) {
             GameOver()
         }
-        
-
-
-
-
-
-
-
-
-
     }
-
     if (!FantomeBleu) {
         time++;
         tempo(time);
@@ -353,13 +324,9 @@ var FBleu = 10000000;
 function bleu() {
     for (f in fantome)
         fantome[f].vitesse = 0.035;
-
     FantomeBleu = true;
-
     mode = "scatter"
     FBleu = timeTotal;
-
-
 }
 function tempo(t) {
     if (t == 700) {
@@ -452,8 +419,7 @@ function drawFantomes() {
                 fantome[f].y = 14;
                 score += fantomeEat;
                 fantomeEat += fantomeEat;
-                var r = f;
-                switch (r) {
+                switch (f) {
                     case "blinky": mangerblinky = timeTotal;
                         break;
                     case "pinky": mangerpinky = timeTotal;
@@ -465,14 +431,8 @@ function drawFantomes() {
                 }
 
             } else {
-                life -= 1;
-
-                if (life == 0)
-                    GameOver();
-                else
-                    repositionne();
+                GameOver();
             }
-
         }
     }
 }
@@ -495,25 +455,20 @@ function GameOver() {
         win2 = 0;
         total2 = 0;
     }
-
     var w = 0;
-
-    if (ptsEat ==2600)
+    if (score >4000)
         w = Math.round((score * 100) / 14800) / 100
 
     for (var i = 0; i < tabArbre.length; i++) {
         try {
             tabArbre[i].t += 1;
             tabArbre[i].w = Math.round((tabArbre[i].w + w) * 100) / 100
-        } catch (error) {
-            
-        }
-       
+        } catch (error) {      
+        }      
     }
     var nb =0;
-    for(obj in tabArbre[tabArbre.length-1]){
-        
-        if(tabArbre[tabArbre.length-1][obj].t==0){
+    for(obj in tabArbre[tabArbre.length-1]){  
+        if(tabArbre[tabArbre.length-1][obj].w==0){
             nb++;
         }
     }
@@ -521,6 +476,7 @@ function GameOver() {
         for(obj in tabArbre[tabArbre.length-1]){
             if(obj !="w" && obj != "t"){
                delete tabArbre[tabArbre.length-1][obj];
+               tabArbre[tabArbre.length-1].w=0
             }
         }
         
@@ -542,9 +498,6 @@ function GameOver() {
         pause = true
         updateMCTS();
     }
-
-
-    d = new Date().getTime();
     nextLvl();
     lvl = 1;
     life = 1;
