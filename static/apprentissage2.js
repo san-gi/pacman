@@ -10,8 +10,6 @@ var pacman = {
     direction: null,
     directionSuivante: null
 }
-var up = false;
-var action = "";
 var time = 0;
 var score = 0;
 var ptsEat = 0;
@@ -23,8 +21,6 @@ var mode = "scatter";
 var FantomeBleu = false;
 var fantomeEat = 200;
 var socket = io.connect('192.168.2.97');
-
-var d = new Date().getTime();
 var pause = false;
 var total = 0;
 var win = 0;
@@ -75,23 +71,22 @@ var timeTotal = 0;
 var MCTS = {
     t: 0,
     w: 0,
-    "25d": {
+    "1d": {
         total: 0,
         w: 0,
     },
-    "25g": {
+    "1g": {
         total: 0,
         w: 0,
     },
-    "25h": {
+    "1h": {
         total: 0,
         w: 0,
     }
 
 }
-socket.emit("getMCTS2");
 var tabArbre = [];
-var Explo = 1.4;
+var Explo = 0.01;
 var arbre = MCTS;
 var Bchoix = 10000000;
 var Cchoix = 10000000;
@@ -99,13 +94,14 @@ var Ichoix = 10000000;
 var Pchoix = 10000000;
 var select = "h";
 $.getJSON('http://192.168.2.97/arbreMCTS2.json', function (data) {
-    console.log(data[0])
-    if (data.total != undefined) {
+    console.log(data)
+    if (data.t != undefined) {
         total = data.t
         win = data.w
         MCTS = data;
         arbre = MCTS;
         console.log("useArbreJson")
+        drawinfo();
     }
 });
 
@@ -247,57 +243,51 @@ function draw() {
         fantome.blinky.y = 11;
         fantomeEat = 200;
     }
-
-
-
-
-
-
-
-
-
-
     if (!pause) {
         timeTotal++;
         if (timeTotal % 25 == 0) {
             tabArbre.push(arbre);
-            if (arbre.t == 0) {
-                arbre[(timeTotal / 25) + "d"] = {
-                    w: 0,
-                    t: 0,
-                };
-                arbre[(timeTotal / 25) + "g"] = {
-                    w: 0,
-                    t: 0,
-                };
-                arbre[(timeTotal / 25) + "h"] = {
-                    w: 0,
-                    t: 0,
-                };
-                arbre[(timeTotal / 25) + "b"] = {
-                    w: 0,
-                    t: 0,
-                };
+            try {
+                if (arbre.t == 0) {
+                    arbre[(timeTotal / 25) + "d"] = {
+                        w: 0,
+                        t: 0,
+                    };
+                    arbre[(timeTotal / 25) + "g"] = {
+                        w: 0,
+                        t: 0,
+                    };
+                    arbre[(timeTotal / 25) + "h"] = {
+                        w: 0,
+                        t: 0,
+                    };
+                    arbre[(timeTotal / 25) + "b"] = {
+                        w: 0,
+                        t: 0,
+                    };
+                }
+            } catch (error) {
+
             }
-            //select = "";
+            select = "";
             var selectN = 0;
-            /* for (choix in arbre) {
-                 if (choix != "w" && choix != "t") {
- 
-                     var c = choix[choix.length - 1]
-                     if (arbre[timeTotal + c].t > 0) {
-                         if (arbre[timeTotal + c].w / arbre[timeTotal + c].t + Explo * Math.sqrt(Math.log(arbre.t) / arbre[timeTotal + c].t) > selectN) {
-                             selectN = arbre[timeTotal + c].w / arbre[timeTotal + c].t + Explo * Math.sqrt(Math.log(arbre.t) / arbre[timeTotal + c].t);
-                             select = c;
-                         }
-                     } else {
-                         if (Explo * Math.sqrt(Math.log(arbre.t)) > selectN) {
-                             selectN = Explo * Math.sqrt(Math.log(arbre.t));
-                             select = c;
-                         }
-                     }
-                 }
-             }*/
+            for (choix in arbre) {
+                if (choix != "w" && choix != "t") {
+
+                    var c = choix[choix.length - 1]
+                    if (arbre[(timeTotal / 25) + c].t > 0) {
+                        if (arbre[(timeTotal / 25) + c].w / arbre[(timeTotal / 25) + c].t + Explo * Math.sqrt(Math.log(arbre.t) / arbre[(timeTotal / 25) + c].t) > selectN) {
+                            selectN = arbre[(timeTotal / 25) + c].w / arbre[(timeTotal / 25) + c].t + Explo * Math.sqrt(Math.log(arbre.t) / arbre[(timeTotal / 25) + c].t);
+                            select = c;
+                        }
+                    } else {
+                        if (Explo * Math.sqrt(Math.log(arbre.t)) * 1.001 > selectN) {
+                            selectN = Explo * Math.sqrt(Math.log(arbre.t)) * 1.001;
+                            select = c;
+                        }
+                    }
+                }
+            }
             switch (select) {
                 case "g": gauche();
                     break;
@@ -311,24 +301,30 @@ function draw() {
                     var t = Math.random();
                     if (t >= 0.75) {
                         gauche();
-                        //select = "g";
+                        select = "g";
                     } else if (t >= 0.5) {
                         droite();
-                        //select = "d";
+                        select = "d";
                     } else if (t >= 0.25) {
                         haut();
-                        //select = "h";
+                        select = "h";
                     } else {
                         bas();
-                        //select = "b";
+                        select = "b";
                     }
             }
-            arbre = arbre[(timeTotal / 25) + select];
-            if (arbre.t > 0)
-                $("#dir").html($("#dir").html() + `<div  class="d-flex justify-content-around"><div class=" bg-secondary">${Math.round((arbre[((timeTotal + 25) / 25) + "h"].w/arbre[((timeTotal + 25) / 25) + "h"].t)*100/100)}</div><div  class=" bg-secondary">${Math.round((arbre[((timeTotal + 25) / 25) + "b"].w/arbre[((timeTotal + 25) / 25) + "b"].t)*100)/100}</div><div class="bg-secondary">${Math.round((arbre[((timeTotal + 25) / 25) + "g"].w/arbre[((timeTotal + 25) / 25) + "g"].t)*100)/100}</div><div class="bg-secondary">${Math.round((arbre[((timeTotal + 25) / 25) + "d"].w/arbre[((timeTotal + 25) / 25) + "d"].t*100)/100)}</div></div>`);
-            else
-                $("#dir").html(`<div><button type="button"  class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button></div>`);
-            $("#dir").scrollTop(1000000)
+            try {
+                console.log((timeTotal / 25) + select)
+                arbre = arbre[(timeTotal / 25) + select];
+
+                if (arbre.t > 0)
+                    $("#dir").html($("#dir").html() + `<div  class="d-flex justify-content-around"><div class=" bg-secondary">${Math.round((arbre[((timeTotal + 25) / 25) + "h"].w / arbre[((timeTotal + 25) / 25) + "h"].t) * 100 / 100)}</div><div  class=" bg-secondary">${Math.round((arbre[((timeTotal + 25) / 25) + "b"].w / arbre[((timeTotal + 25) / 25) + "b"].t) * 100) / 100}</div><div class="bg-secondary">${Math.round((arbre[((timeTotal + 25) / 25) + "g"].w / arbre[((timeTotal + 25) / 25) + "g"].t) * 100) / 100}</div><div class="bg-secondary">${Math.round((arbre[((timeTotal + 25) / 25) + "d"].w / arbre[((timeTotal + 25) / 25) + "d"].t * 100) / 100)}</div></div>`);
+                else
+                    $("#dir").html(`<div><button type="button"  class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button></div>`);
+                $("#dir").scrollTop(1000000)
+            } catch (error) {
+                GameOver()
+            }
         }
 
         if (!FantomeBleu) {
@@ -340,10 +336,6 @@ function draw() {
         drawFantomes();
         if (fruit)
             drawFruit();
-        if (score > 10000 && !up) {
-            life++
-            up = true;
-        }
 
     }
 
@@ -359,13 +351,9 @@ var FBleu = 10000000;
 function bleu() {
     for (f in fantome)
         fantome[f].vitesse = 0.035;
-
     FantomeBleu = true;
-
     mode = "scatter"
     FBleu = timeTotal;
-
-
 }
 function tempo(t) {
     if (t == 700) {
@@ -452,7 +440,7 @@ function drawFantomes() {
                 break;
         }
 
-        if (Math.round(fantome[f].x) == Math.round(pacman.x) && Math.round(fantome[f].y) == Math.round(pacman.y)) {
+        if (pacman.x < fantome[f].x + 0.2 && pacman.x > fantome[f].x - 0.2 && pacman.y < fantome[f].y + 0.2 && pacman.y > fantome[f].y - 0.2) {
             if (FantomeBleu) {
                 fantome[f].x = 13.5;
                 fantome[f].y = 14;
@@ -471,13 +459,7 @@ function drawFantomes() {
                 }
 
             } else {
-                life -= 1;
-
-                if (life == 0)
-                    GameOver();
-                else
-                    repositionne();
-                drawinfo();
+                GameOver();
             }
 
         }
@@ -494,6 +476,8 @@ function drawFantomes() {
 }
 
 function GameOver() {
+    console.log(arbre)
+    tabArbre.push(arbre);
     mangerInky = 10000000;
     mangerpinky = 10000000;
     mangerclyde = 10000000;
@@ -508,12 +492,38 @@ function GameOver() {
     var w = 0;
     if (ptsEat > 0)
         w = Math.round((score * 1000) / 14800) / 1000
-        if(tabArbre[tabArbre.length].t===0)
-        for (var i = 0; i < tabArbre.length; i++) {
+    //if (tabArbre[tabArbre.length].t === 0)
+    for (var i = 0; i < tabArbre.length; i++) {
+        try {
             tabArbre[i].t += 1;
-            //tabArbre[i].w += w
-            tabArbre[i].w = Math.round((tabArbre[i].w + w) * 100) / 100
+            if (Object.keys(tabArbre[i]).length > 2)
+                tabArbre[i].w = Math.round((tabArbre[i].w + w) * 100) / 100
+        } catch (error) {
         }
+    }
+    console.log(tabArbre)
+    var nb = 0;
+    for (obj in tabArbre[tabArbre.length - 1]) {
+        if (tabArbre[tabArbre.length - 1][obj].w == 0 && tabArbre[tabArbre.length - 1][obj].t > 0) {
+            nb++;
+        }
+    } if (nb < 4) {
+        nb = 0
+        for (obj in tabArbre[tabArbre.length - 1]) {
+            if (tabArbre[tabArbre.length - 1][obj].w == 0 && tabArbre[tabArbre.length - 1][obj].t == 0) {
+                nb++;
+            }
+        }
+    }
+    if (nb == 4) {
+        for (obj in tabArbre[tabArbre.length - 1]) {
+            if (obj != "w" && obj != "t") {
+                delete tabArbre[tabArbre.length - 1][obj];
+
+            }
+        }
+        tabArbre[tabArbre.length - 1].w = 0
+    }
     fruit = false;
     win += w;
     total += 1;
@@ -526,8 +536,6 @@ function GameOver() {
     fantome.inky.choix = false;
     fantome.pinky.choix = false;
     updateMCTS();
-
-    d = new Date().getTime();
     nextLvl();
     lvl = 1;
     life = 1;
@@ -940,5 +948,5 @@ function bas() {
 resize();
 repositionne();
 setTimeout(() => {
-    setInterval(function () { draw(); }, 10);
+    setInterval(function () { draw(); }, 1);
 }, 1000);

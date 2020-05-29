@@ -103,7 +103,7 @@ var MCTS = {
 var win2 = 0;
 var total2 = 0;
 var tabArbre = [];
-var Explo = 0.3;
+var Explo = 0.01;
 var arbre = MCTS;
 console.log(MCTS)
 var Bchoix = 10000000;
@@ -257,13 +257,13 @@ function draw() {
                 };
             }
         } catch (error) {
-            
+
         }
-        
+
         var select = "";
         var selectN = 0;
         for (choix in arbre) {
-            if (choix != "w" && choix != "t" && choix !="z" ) {
+            if (choix != "w" && choix != "t") {
 
                 var c = choix[choix.length - 1]
                 if (arbre[(timeTotal / 25) + c].t > 0) {
@@ -272,8 +272,8 @@ function draw() {
                         select = c;
                     }
                 } else {
-                    if (Explo * Math.sqrt(Math.log(arbre.t)) > selectN) {
-                        selectN = Explo * Math.sqrt(Math.log(arbre.t));
+                    if (Explo * Math.sqrt(Math.log(arbre.t)) * 1.001 > selectN) {
+                        selectN = Explo * Math.sqrt(Math.log(arbre.t)) * 1.001;
                         select = c;
                     }
                 }
@@ -413,7 +413,9 @@ function drawFantomes() {
                 break;
         }
 
-        if (Math.round(fantome[f].x) == Math.round(pacman.x) && Math.round(fantome[f].y) == Math.round(pacman.y)) {
+        if (pacman.x < fantome[f].x + 0.2 && pacman.x > fantome[f].x - 0.2 && pacman.y < fantome[f].y + 0.2 && pacman.y > fantome[f].y - 0.2) {
+
+
             if (FantomeBleu) {
                 fantome[f].x = 13.5;
                 fantome[f].y = 14;
@@ -438,7 +440,8 @@ function drawFantomes() {
 }
 
 function GameOver() {
-    fantomeEat=200;
+    tabArbre.push(arbre);
+    fantomeEat = 200;
     mangerInky = 10000000;
     mangerpinky = 10000000;
     mangerclyde = 10000000;
@@ -451,35 +454,43 @@ function GameOver() {
     SortiePinky = 10000000;
 
     if (total % 1000 == 0) {
-        console.log(highscore + " " + higheat + " " + total + " " + win2 /total2 + " " + win/ total)
+        console.log(highscore + " " + higheat + " " + total + " " + win2 / total2 + " " + win / total)
         win2 = 0;
         total2 = 0;
     }
     var w = 0;
-    if (score >4000)
+    if (score > 0)
         w = Math.round((score * 100) / 14800) / 100
 
     for (var i = 0; i < tabArbre.length; i++) {
         try {
             tabArbre[i].t += 1;
-            tabArbre[i].w = Math.round((tabArbre[i].w + w) * 100) / 100
-        } catch (error) {      
-        }      
+            if (Object.keys(tabArbre[i]).length > 2)
+                tabArbre[i].w = Math.round((tabArbre[i].w + w) * 100) / 100
+        } catch (error) {
+        }
     }
-    var nb =0;
-    for(obj in tabArbre[tabArbre.length-1]){  
-        if(tabArbre[tabArbre.length-1][obj].w==0){
+    var nb = 0;
+    for (obj in tabArbre[tabArbre.length - 1]) {
+        if (tabArbre[tabArbre.length - 1][obj].w == 0 && tabArbre[tabArbre.length - 1][obj].t > 0) {
             nb++;
         }
-    }
-    if(nb==4){
-        for(obj in tabArbre[tabArbre.length-1]){
-            if(obj !="w" && obj != "t"){
-               delete tabArbre[tabArbre.length-1][obj];
-               tabArbre[tabArbre.length-1].w=0
+    } if (nb < 4) {
+        nb = 0
+        for (obj in tabArbre[tabArbre.length - 1]) {
+            if (tabArbre[tabArbre.length - 1][obj].w == 0 && tabArbre[tabArbre.length - 1][obj].t == 0) {
+                nb++;
             }
         }
-        
+    }
+    if (nb == 4) {
+        for (obj in tabArbre[tabArbre.length - 1]) {
+            if (obj != "w" && obj != "t") {
+                delete tabArbre[tabArbre.length - 1][obj];
+
+            }
+        }
+        tabArbre[tabArbre.length - 1].w = 0
     }
     fruit = false;
     win = Math.round((win + w) * 100) / 100;
@@ -494,7 +505,7 @@ function GameOver() {
     fantome.clyde.choix = false;
     fantome.inky.choix = false;
     fantome.pinky.choix = false;
-    if (total % 100000 == 0) {
+    if (total % 10000 == 0) {
         pause = true
         updateMCTS();
     }
@@ -672,8 +683,8 @@ function eat(nb) {
         fruit = true;
     if (score > highscore)
         highscore = score;
-    
-       
+
+
     if (ptsEat > higheat)
         higheat = ptsEat
     if (ptsEat == 2600) {
@@ -793,4 +804,4 @@ setTimeout(() => {
 }, 1000);
 
 
-server.listen(80)
+server.listen(8080)
