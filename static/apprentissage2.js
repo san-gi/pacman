@@ -94,6 +94,10 @@ var Cchoix = 10000000;
 var Ichoix = 10000000;
 var Pchoix = 10000000;
 var select = "h";
+var PhaseChoix = false
+var tabChoix = [];
+var nbphase = 0;
+var selectTourche ="";
 $.getJSON('http://192.168.2.97/arbreMCTS2.json', function (data) {
     console.log(data)
     if (data.t != undefined) {
@@ -196,8 +200,8 @@ var tabEat =
     ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]];
 var tabEat2 =
     [["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-    ["0", "1", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-    ["0", "1", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+    ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+    ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
     ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
     ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
     ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
@@ -289,24 +293,27 @@ function draw() {
         }
         if (!pause) {
             timeTotal++;
-            if (timeTotal % 36 == 0) {
-                if (tabArbre.length < 100)
-                    tabArbre.push(arbre);
+            if (timeTotal % 12 == 0) {
+
+
+
+
+
                 try {
-                    if (arbre.t == 0 && tabArbre.length < 100) {
-                        arbre[(timeTotal / 36) + "d"] = {
+                    if (arbre.t == 0) {
+                        arbre[(timeTotal / 12) + "d"] = {
                             w: 0,
                             t: 0,
                         };
-                        arbre[(timeTotal / 36) + "g"] = {
+                        arbre[(timeTotal / 12) + "g"] = {
                             w: 0,
                             t: 0,
                         };
-                        arbre[(timeTotal / 36) + "h"] = {
+                        arbre[(timeTotal / 12) + "h"] = {
                             w: 0,
                             t: 0,
                         };
-                        arbre[(timeTotal / 36) + "b"] = {
+                        arbre[(timeTotal / 12) + "b"] = {
                             w: 0,
                             t: 0,
                         };
@@ -314,15 +321,16 @@ function draw() {
                 } catch (error) {
 
                 }
+
                 select = "";
                 var selectN = 0;
                 for (choix in arbre) {
                     if (choix != "w" && choix != "t") {
 
                         var c = choix[choix.length - 1]
-                        if (arbre[(timeTotal / 36) + c].t > 0) {
-                            if (arbre[(timeTotal / 36) + c].w / arbre[(timeTotal / 36) + c].t + Explo * Math.sqrt(Math.log(arbre.t) / arbre[(timeTotal / 36) + c].t) > selectN) {
-                                selectN = arbre[(timeTotal / 36) + c].w / arbre[(timeTotal / 36) + c].t + Explo * Math.sqrt(Math.log(arbre.t) / arbre[(timeTotal / 36) + c].t);
+                        if (arbre[(timeTotal / 12) + c].t > 0) {
+                            if (arbre[(timeTotal / 12) + c].w / arbre[(timeTotal / 12) + c].t + Explo * Math.sqrt(Math.log(arbre.t) / arbre[(timeTotal / 12) + c].t) > selectN) {
+                                selectN = arbre[(timeTotal / 12) + c].w / arbre[(timeTotal / 12) + c].t + Explo * Math.sqrt(Math.log(arbre.t) / arbre[(timeTotal / 12) + c].t);
                                 select = c;
                             }
                         } else {
@@ -333,6 +341,18 @@ function draw() {
                         }
                     }
                 }
+                if (PhaseChoix && selectTourche !="")
+                    select = selectTourche;
+
+
+
+                if (PhaseChoix && nbphase < tabChoix.length)
+                    select = tabChoix[nbphase]
+                PhaseChoix = true;
+
+
+
+                tabArbre.push(arbre);
                 switch (select) {
                     case "g": gauche();
                         break;
@@ -358,15 +378,25 @@ function draw() {
                             select = "b";
                         }
                 }
-                try {
-                    console.log((timeTotal / 36) + select)
-                    arbre = arbre[(timeTotal / 36) + select];
+                if (nbphase == tabChoix.length) {
 
-                    if (arbre.t > 0)
-                        $("#dir").html($("#dir").html() + `<div  class="d-flex justify-content-around"><div class=" bg-secondary">${Math.round((arbre[((timeTotal + 36) / 36) + "h"].w / arbre[((timeTotal + 36) / 36) + "h"].t) * 100 / 100)}</div><div  class=" bg-secondary">${Math.round((arbre[((timeTotal + 36) / 36) + "b"].w / arbre[((timeTotal + 36) / 36) + "b"].t) * 100) / 100}</div><div class="bg-secondary">${Math.round((arbre[((timeTotal + 36) / 36) + "g"].w / arbre[((timeTotal + 36) / 36) + "g"].t) * 100) / 100}</div><div class="bg-secondary">${Math.round((arbre[((timeTotal + 36) / 36) + "d"].w / arbre[((timeTotal + 36) / 36) + "d"].t * 100) / 100)}</div></div>`);
-                    else
-                        $("#dir").html(`<div><button type="button"  class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button></div>`);
-                    $("#dir").scrollTop(1000000)
+
+
+                    tabChoix.push(select)
+
+                    PhaseChoix = false
+                    nbphase = 10000000
+                }
+                nbphase++;
+                try {
+                    arbre = arbre[(timeTotal / 12) + select];
+                    if (!PhaseChoix) {
+                        if (arbre.t > 0)
+                            $("#dir").html($("#dir").html() + `<div  class="d-flex justify-content-around"><div class=" bg-secondary">${Math.round((arbre[((timeTotal + 12) / 12) + "h"].w / arbre[((timeTotal + 12) / 12) + "h"].t) * 100 / 100)}</div><div  class=" bg-secondary">${Math.round((arbre[((timeTotal + 12) / 12) + "b"].w / arbre[((timeTotal + 12) / 12) + "b"].t) * 100) / 100}</div><div class="bg-secondary">${Math.round((arbre[((timeTotal + 12) / 12) + "g"].w / arbre[((timeTotal + 12) / 12) + "g"].t) * 100) / 100}</div><div class="bg-secondary">${Math.round((arbre[((timeTotal + 12) / 12) + "d"].w / arbre[((timeTotal + 12) / 12) + "d"].t * 100) / 100)}</div></div>`);
+                        else
+                            $("#dir").html(`<div><button type="button"  class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button><button type="button" class="btn btn-dark">?</button></div>`);
+                        $("#dir").scrollTop(1000000)
+                    }
                 } catch (error) {
                     GameOver()
                 }
@@ -384,13 +414,20 @@ function draw() {
 
         }
     }
+    if (PhaseChoix) {
+
+        draw()
+    }
 }
+
 function drawFruit() {
-    ctx.beginPath();
-    ctx.arc(14 * taille, 25.5 * taille, taille / 1.5, 0, Math.PI * 2);
-    ctx.fillStyle = "#cd5757";
-    ctx.fill();
-    ctx.closePath();
+    if (!PhaseChoix) {
+        ctx.beginPath();
+        ctx.arc(14 * taille, 25.5 * taille, taille / 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = "#cd5757";
+        ctx.fill();
+        ctx.closePath();
+    }
 }
 var FBleu = 10000000;
 function bleu() {
@@ -508,19 +545,22 @@ function drawFantomes() {
             }
 
         }
-
-        ctx.beginPath();
-        ctx.arc(fantome[f].x * taille + taille / 2, fantome[f].y * taille + taille / 2 + 8 * taille, taille / 1.8, 0, Math.PI * 2);
-        if (!FantomeBleu)
-            ctx.fillStyle = fantome[f].couleur;
-        else
-            ctx.fillStyle = "#0000ff";
-        ctx.fill();
-        ctx.closePath();
+        if (!PhaseChoix) {
+            ctx.beginPath();
+            ctx.arc(fantome[f].x * taille + taille / 2, fantome[f].y * taille + taille / 2 + 8 * taille, taille / 1.8, 0, Math.PI * 2);
+            if (!FantomeBleu)
+                ctx.fillStyle = fantome[f].couleur;
+            else
+                ctx.fillStyle = "#0000ff";
+            ctx.fill();
+            ctx.closePath();
+        }
     }
 }
 
 function GameOver() {
+
+    nbphase = 0;
     for (var i = 0; i < 31; i++) {
         tabEat3[i] = []
         for (var j = 0; j < 28; j++) {
@@ -533,7 +573,6 @@ function GameOver() {
             tabEat2[i][j] = "0"
         }
     }
-    console.log(arbre)
     tabArbre.push(arbre);
     mangerInky = 10000000;
     mangerpinky = 10000000;
@@ -546,71 +585,80 @@ function GameOver() {
     FBleu = 10000000;
     SortiePinky = 10000000;
     $("#dir").html("");
-    var w = 0;
-    if (ptsEat > 0)
-        w = Math.round((score * 1000) / 14800) / 1000
-    //if (tabArbre[tabArbre.length].t === 0)
-    for (var i = 0; i < tabArbre.length; i++) {
-        try {
-            tabArbre[i].t += 1;
-            if (Object.keys(tabArbre[i]).length > 2)
-                tabArbre[i].w = Math.round((tabArbre[i].w + w) * 100) / 100
-        } catch (error) {
+    var w = 1;
+    if (!PhaseChoix) {
+        if (ptsEat > 0)
+            w = Math.round((score * 1000) / 14800) / 1000
+        //if (tabArbre[tabArbre.length].t === 0)
+        for (var i = 0; i < tabArbre.length; i++) {
+            try {
+                tabArbre[i].t += 1;
+                if (Object.keys(tabArbre[i]).length > 2)
+                    tabArbre[i].w = Math.round((tabArbre[i].w + w) * 100) / 100
+            } catch (error) {
+            }
         }
-    }
-    console.log(tabArbre)
-    var nb = 0;
-    for (obj in tabArbre[tabArbre.length - 3]) {
-        if (tabArbre[tabArbre.length - 3][obj].w == 0 && tabArbre[tabArbre.length - 3][obj].t > 0) {
-            nb++;
-        }
-    } if (nb < 4) {
-        nb = 0
+        var nb = 0;
         for (obj in tabArbre[tabArbre.length - 3]) {
-            if (tabArbre[tabArbre.length - 3][obj].w == 0 && tabArbre[tabArbre.length - 3][obj].t == 0) {
+            if (tabArbre[tabArbre.length - 3][obj].w == 0 && tabArbre[tabArbre.length - 3][obj].t > 0) {
+                nb++;
+            }
+        } if (nb < 4) {
+            nb = 0
+            for (obj in tabArbre[tabArbre.length - 3]) {
+                if (tabArbre[tabArbre.length - 3][obj].w == 0 && tabArbre[tabArbre.length - 3][obj].t == 0) {
+                    nb++;
+                }
+            }
+        }
+        if (nb == 4) {
+            for (obj in tabArbre[tabArbre.length - 3]) {
+                if (obj != "w" && obj != "t") {
+                    delete tabArbre[tabArbre.length - 3][obj];
+                }
+            }
+            tabArbre[tabArbre.length - 3].w = 0
+        }
+        nb = 0
+        for (obj in tabArbre[tabArbre.length - 2]) {
+            if (tabArbre[tabArbre.length - 2][obj].w == 0 && tabArbre[tabArbre.length - 2][obj].t > 0) {
                 nb++;
             }
         }
-    }
-    if (nb == 4) {
-        for (obj in tabArbre[tabArbre.length - 3]) {
-            if (obj != "w" && obj != "t") {
-                delete tabArbre[tabArbre.length - 3][obj];
+        if (nb == 4) {
+            for (obj in tabArbre[tabArbre.length - 2]) {
+                if (obj != "w" && obj != "t") {
+                    delete tabArbre[tabArbre.length - 2][obj];
+                }
             }
+            tabArbre[tabArbre.length - 2].w = 0
         }
-        tabArbre[tabArbre.length - 3].w = 0
-    }
-    nb = 0
-    for (obj in tabArbre[tabArbre.length - 2]) {
-        if (tabArbre[tabArbre.length - 2][obj].w == 0 && tabArbre[tabArbre.length - 2][obj].t > 0) {
-            nb++;
-        }
-    }
-    if (nb == 4) {
-        for (obj in tabArbre[tabArbre.length - 2]) {
-            if (obj != "w" && obj != "t") {
-                delete tabArbre[tabArbre.length - 2][obj];
-            }
-        }
-        tabArbre[tabArbre.length - 2].w = 0
+        win += w;
+        total += 1;
     }
     fruit = false;
-    win += w;
-    total += 1;
+
+
     tabArbre = [];
+
+
     timeTotal = 0;
     arbre = MCTS;
-
+    if (!PhaseChoix) {
+        tabChoix = []
+        updateMCTS();
+        selectTourche =""
+    }
     fantome.blinky.choix = false;
     fantome.clyde.choix = false;
     fantome.inky.choix = false;
     fantome.pinky.choix = false;
-    updateMCTS();
+
     nextLvl();
     lvl = 1;
     life = 1;
     score = 0;
-
+    select = "h";
 }
 async function updateMCTS() {
     socket.emit("updateMCTS2", JSON.stringify(MCTS))
@@ -739,7 +787,8 @@ function drawPacman() {
                 pacman.direction = pacman.directionSuivante
             break;
     }
-    tabEat2[Math.round(pacman.y)][Math.round(pacman.x)] = "1"
+    if (nbphase > tabArbre.length)
+        tabEat2[Math.round(pacman.y)][Math.round(pacman.x)] = "1"
     if (tabEat[Math.round(pacman.y)][Math.round(pacman.x)] == "1") {
         tabEat[Math.round(pacman.y)][Math.round(pacman.x)] = "3"
         eat(10);
@@ -748,11 +797,13 @@ function drawPacman() {
         eat(50);
         bleu();
     }
-    ctx.beginPath();
-    ctx.arc(pacman.x * taille + taille / 2, pacman.y * taille + taille / 2 + 8 * taille, taille / 1.8, 0, Math.PI * 2);
-    ctx.fillStyle = "#FFFF00";
-    ctx.fill();
-    ctx.closePath();
+    if (!PhaseChoix) {
+        ctx.beginPath();
+        ctx.arc(pacman.x * taille + taille / 2, pacman.y * taille + taille / 2 + 8 * taille, taille / 1.8, 0, Math.PI * 2);
+        ctx.fillStyle = "#FFFF00";
+        ctx.fill();
+        ctx.closePath();
+    }
 }
 function eat(nb) {
     score += nb;
@@ -821,27 +872,29 @@ function repositionne() {
 
 }
 function drawinfo() {
-    ctx.beginPath();
-    ctx.rect(0, 0, taille * 28, taille * 8);
-    ctx.fillStyle = "#111111";
-    ctx.fill();
-    ctx.closePath();
-    ctx.beginPath();
-    ctx.rect(0, 40 * taille, taille * 28, taille * 4);
-    ctx.fillStyle = "#111111";
-    ctx.fill();
-    ctx.closePath();
-    ctx.font = "16px Arial";
-    ctx.fillStyle = "#FFFFFF";
-    ctx.textAlign = "center";
-    ctx.fillText(score, 5 * taille, 7 * taille);
-    ctx.fillText(highscore, 14 * taille, 5 * taille);
-    ctx.fillText("HIGH SCORE", 14 * taille, 3 * taille);
-    ctx.fillText("LIFE : " + life, 5 * taille, 43 * taille);
-    ctx.fillText("LVL : " + lvl, 24 * taille, 43 * taille);
-    ctx.font = "12px Arial";
-    ctx.fillText("Total : " + total, 19 * taille, 6 * taille);
-    ctx.fillText("win : " + win, 19 * taille, 7.5 * taille);
+    if (!PhaseChoix) {
+        ctx.beginPath();
+        ctx.rect(0, 0, taille * 28, taille * 8);
+        ctx.fillStyle = "#111111";
+        ctx.fill();
+        ctx.closePath();
+        ctx.beginPath();
+        ctx.rect(0, 40 * taille, taille * 28, taille * 4);
+        ctx.fillStyle = "#111111";
+        ctx.fill();
+        ctx.closePath();
+        ctx.font = "16px Arial";
+        ctx.fillStyle = "#FFFFFF";
+        ctx.textAlign = "center";
+        ctx.fillText(score, 5 * taille, 7 * taille);
+        ctx.fillText(highscore, 14 * taille, 5 * taille);
+        ctx.fillText("HIGH SCORE", 14 * taille, 3 * taille);
+        ctx.fillText("LIFE : " + life, 5 * taille, 43 * taille);
+        ctx.fillText("LVL : " + lvl, 24 * taille, 43 * taille);
+        ctx.font = "12px Arial";
+        ctx.fillText("Total : " + total, 19 * taille, 6 * taille);
+        ctx.fillText("win : " + win, 19 * taille, 7.5 * taille);
+    }
 }
 function directionPacman() {
     switch (pacman.directionSuivante) {
@@ -864,50 +917,52 @@ function directionPacman() {
     }
 }
 function drawEat() {
+    if (!PhaseChoix)
     for (var i = 0; i < 28; i++) {
         for (var j = 0; j < 31; j++) {
-            switch (tabEat[j][i]) {
-                case '1':
-                    ctx.beginPath();
-                    ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
-                    if (tabEat3[j][i] == "0")
-                        ctx.fillStyle = "#111111";
-                    else
-                        ctx.fillStyle = "#333333";
-                    ctx.fill();
-                    ctx.closePath();
-                    ctx.beginPath();
-                    ctx.arc(i * taille + taille / 2, j * taille + taille / 2 + 8 * taille, taille / 6, 0, Math.PI * 2);
-                    ctx.fillStyle = "#FFFF00";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                case '2':
-                    ctx.beginPath();
-                    ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
-                    if (tabEat3[j][i] == "0")
-                        ctx.fillStyle = "#111111";
-                    else
-                        ctx.fillStyle = "#333333";
-                    ctx.fill();
-                    ctx.closePath();
-                    ctx.beginPath();
-                    ctx.arc(i * taille + taille / 2, j * taille + taille / 2 + 8 * taille, taille / 4, 0, Math.PI * 2);
-                    ctx.fillStyle = "#f6f6f6";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                case '3':
-                    ctx.beginPath();
-                    ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
-                    if (tabEat3[j][i] == "0")
-                        ctx.fillStyle = "#111111";
-                    else
-                        ctx.fillStyle = "#333333";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-            }
+            
+                switch (tabEat[j][i]) {
+                    case '1':
+                        ctx.beginPath();
+                        ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
+                        if (tabEat3[j][i] == "0")
+                            ctx.fillStyle = "#111111";
+                        else
+                            ctx.fillStyle = "#333333";
+                        ctx.fill();
+                        ctx.closePath();
+                        ctx.beginPath();
+                        ctx.arc(i * taille + taille / 2, j * taille + taille / 2 + 8 * taille, taille / 6, 0, Math.PI * 2);
+                        ctx.fillStyle = "#FFFF00";
+                        ctx.fill();
+                        ctx.closePath();
+                        break;
+                    case '2':
+                        ctx.beginPath();
+                        ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
+                        if (tabEat3[j][i] == "0")
+                            ctx.fillStyle = "#111111";
+                        else
+                            ctx.fillStyle = "#333333";
+                        ctx.fill();
+                        ctx.closePath();
+                        ctx.beginPath();
+                        ctx.arc(i * taille + taille / 2, j * taille + taille / 2 + 8 * taille, taille / 4, 0, Math.PI * 2);
+                        ctx.fillStyle = "#f6f6f6";
+                        ctx.fill();
+                        ctx.closePath();
+                        break;
+                    case '3':
+                        ctx.beginPath();
+                        ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
+                        if (tabEat3[j][i] == "0")
+                            ctx.fillStyle = "#111111";
+                        else
+                            ctx.fillStyle = "#333333";
+                        ctx.fill();
+                        ctx.closePath();
+                        break;
+                }
         }
     }
     if (fruit && Math.round(pacman.y) == 17 && Math.round(pacman.x * 2) == 27) {
@@ -980,22 +1035,22 @@ document.addEventListener("keydown", keyDownHandler, false);
 function keyDownHandler(e) {
     if (e.key == "d" || e.key == "ArrowRight") {
         //droite();
-        select = "d"
+        selectTourche = "d"
 
     }
     else if (e.key == "q" || e.key == "a" || e.key == "ArrowLeft") {
         //gauche();
-        select = "g"
+        selectTourche = "g"
 
     }
     else if (e.key == "z" || e.key == "w" || e.key == "ArrowUp") {
         //haut();
-        select = "h"
+        selectTourche = "h"
 
     }
     else if (e.key == "s" || e.key == "ArrowDown") {
         //bas();
-        select = "b"
+        selectTourche = "b"
 
     } else if (e.key == " ") {
         pause = !pause;
@@ -1028,7 +1083,7 @@ function bas() {
 resize();
 repositionne();
 setTimeout(() => {
-    setInterval(function () { draw(); }, 1);
+    setInterval(function () { draw(); }, 10);
 }, 1000);
 
 
@@ -1039,7 +1094,9 @@ superposer le plus longtemps possibl
 choisir le taux 'erreur optimal
 
 
-en gros, on va faire que, a chaque boucle, ça continue le jeu automatique pour essiner le chemin selon les meilleurs coups possible, on va faire que la seul if, c'est que quan ça essine bha c'est pas en moe auto
+en gros, on va faire que, a chaque boucle, ça continue le jeu automatique pour essiner le
+chemin selon les meilleurs coups possible, on va faire que la seul if,
+c'est que quan ça essine bha c'est pas en moe auto
 et quan ça continue c'est autp
 */
 
