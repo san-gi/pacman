@@ -121,9 +121,9 @@ function resize() {
     var w = window.innerWidth;
     ratio = 280 / 450;
 
-    jeuW = (h - 50) * (280 / 450)
+    jeuW = (h - 240) * (280 / 450)
 
-    jeuH = (h - 50);
+    jeuH = (h - 240);
 
     taille = jeuH / 45 - ((jeuH / 45) % 2);
     document.getElementById('Game').width = taille * 28;
@@ -293,6 +293,11 @@ function draw() {
 
             timeTotal++;
             if (timeTotal % 12 == 0) {
+
+
+
+
+
                 try {
                     if (arbre.t == 0) {
                         arbre[(timeTotal / 12) + "d"] = {
@@ -317,64 +322,26 @@ function draw() {
                 }
 
                 select = "";
-
-
-                if (PhaseChoix && selectTourche != "") {
-                    select = selectTourche;
-                    if (nbphase > tabChoix.length) {
-                        select = "";
-                        var xx = Math.round(pacman.x);
-                        var yy = Math.round(pacman.y)
-                        var istance = 10000
-                        var tta = [];
+                var selectN = 0;
+                for (choix in arbre) { // pour chaque branche
+                    if (choix != "w" && choix != "t") {
 
                         /**
-                         * tabeat, c'est celui ou on peu voir les mur. 0= mur, 1 et 2 sont les gomme, et 3 c'est un chemin libre
-                         * tabeat3, c'est le tableau libre, 
+                         * ici qu'il faut explorer le tab pour voir le chemin le court chemin valie pour aller sur une gomme
+                         * 
+                         *  parcourir le tableau, et recursion a chaque embrenchement pour chercher la boule la plus proche
+                         * 
                          */
-                        for (var i = 0; i < 31; i++) {
-                            tta[i] = []
-                            for (var j = 0; j < 28; j++) {
-                                tta[i][j] = "0"
-                            }
-                        }
 
-                        function parcours(x, y, ir, nbrecur) {
-                            if (tabEat[y][x] != 0) {
-                                if ((tta[y][x] == 0 || tta[y][x] > nbrecur)&&nbrecur < istance) {
-                                    tta[y][x] = nbrecur;
-                                    if (tabEat[y][x] == "1" || tabEat[y][x] == "2") {
-   
-                                            istance = nbrecur
-                                            select = ir
-
-
-                                    } else {
-                                        parcours(x + 1, y, ir, nbrecur + 1)
-                                        parcours(x - 1, y, ir, nbrecur + 1)
-                                        parcours(x, y + 1, ir, nbrecur + 1)
-                                        parcours(x, y - 1, ir, nbrecur + 1)
-                                    }
-
-                                }
-
-                            }
-                        }
-                        parcours(xx + 1, yy, "d", 1)
-                        parcours(xx - 1, yy, "g", 1)
-                        parcours(xx, yy + 1, "b", 1)
-                        parcours(xx, yy - 1, "h", 1)
-                        tta[yy][xx] = "aa"
-                        for (var i = 0; i < 31; i++) {
-                            tta[i] = tta[i].join(" ")
-                        }
-                        //console.log(select + " " + xx + " " + yy)
-                        //console.log(tta)
-
-
+                        var c = choix[choix.length - 1]
+                        select = "g";
+                        
                     }
                 }
-                if (PhaseChoix && nbphase < tabChoix.length) {
+                if (PhaseChoix && selectTourche != ""){
+                    select = selectTourche;
+                }
+                if (PhaseChoix && nbphase < tabChoix.length){
                     select = tabChoix[nbphase]
                 }
                 PhaseChoix = true;
@@ -595,7 +562,7 @@ function GameOver() {
             tabEat2[i][j] = "0"
         }
     }
-    
+    tabArbre.push(arbre);
     mangerInky = 10000000;
     mangerpinky = 10000000;
     mangerclyde = 10000000;
@@ -606,12 +573,9 @@ function GameOver() {
     Pchoix = 10000000;
     FBleu = 10000000;
     SortiePinky = 10000000;
-    
-    
+    $("#dir").html("");
+    var w = 1;
     if (!PhaseChoix) {
-        tabArbre.push(arbre);
-        var w = 1;
-        $("#dir").html("");
         //if (tabArbre[tabArbre.length].t === 0)
         for (var i = 0; i < tabArbre.length; i++) {
             try {
@@ -948,10 +912,10 @@ function drawEat() {
                     case '1':
                         ctx.beginPath();
                         ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
-                        if (tabEat3[j][i] != "0")
-                            ctx.fillStyle = "#333333";
-                        else
+                        if (tabEat3[j][i] == "0" || tabEat3[j][i] =="3")
                             ctx.fillStyle = "#111111";
+                        else
+                            ctx.fillStyle = "#333333";
                         ctx.fill();
                         ctx.closePath();
                         ctx.beginPath();
@@ -963,10 +927,10 @@ function drawEat() {
                     case '2':
                         ctx.beginPath();
                         ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
-                        if (tabEat3[j][i] != "0")
-                            ctx.fillStyle = "#333333";
-                        else
+                        if (tabEat3[j][i] == "0" || tabEat3[j][i] =="3")
                             ctx.fillStyle = "#111111";
+                        else
+                            ctx.fillStyle = "#333333";
                         ctx.fill();
                         ctx.closePath();
                         ctx.beginPath();
@@ -978,10 +942,10 @@ function drawEat() {
                     case '3':
                         ctx.beginPath();
                         ctx.rect(i * taille - taille / 4, j * taille + 8 * taille - taille / 4, taille * 1.5, taille * 1.5);
-                        if (tabEat3[j][i] != "0")
-                            ctx.fillStyle = "#333333";
-                        else
+                        if (tabEat3[j][i] == "0" || tabEat3[j][i] =="3")
                             ctx.fillStyle = "#111111";
+                        else
+                            ctx.fillStyle = "#333333";
                         ctx.fill();
                         ctx.closePath();
                         break;
@@ -1106,7 +1070,7 @@ function bas() {
 resize();
 repositionne();
 setTimeout(() => {
-    setInterval(function () { draw(); }, 20);
+    setInterval(function () { draw(); }, 10);
 }, 1000);
 
 
