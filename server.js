@@ -26,6 +26,9 @@ app.get('', (req, res) => {
     res.sendFile(__dirname + '/static/apprentissage2.html');
 });
 app.get('', (req, res) => {
+    res.sendFile(__dirname + '/static/app3.html');
+});
+app.get('', (req, res) => {
     res.sendFile(__dirname + '/static/arbreMCTS.json');
 });
 app.get('', (req, res) => {

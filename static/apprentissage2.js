@@ -10,6 +10,9 @@ var pacman = {
     direction: null,
     directionSuivante: null
 }
+var perTo = 0;
+var perAct = 0;
+var tta = [];
 var time = 0;
 var score = 0;
 var ptsEat = 0;
@@ -321,13 +324,12 @@ function draw() {
 
                 if (PhaseChoix && selectTourche != "") {
                     select = selectTourche;
-                    if (nbphase > tabChoix.length) {
+                    if (nbphase > tabChoix.length - 1) {
                         select = "";
                         var xx = Math.round(pacman.x);
                         var yy = Math.round(pacman.y)
                         var istance = 10000
-                        var tta = [];
-
+                        tta = [];
                         /**
                          * tabeat, c'est celui ou on peu voir les mur. 0= mur, 1 et 2 sont les gomme, et 3 c'est un chemin libre
                          * tabeat3, c'est le tableau libre, 
@@ -341,12 +343,12 @@ function draw() {
 
                         function parcours(x, y, ir, nbrecur) {
                             if (tabEat[y][x] != 0) {
-                                if ((tta[y][x] == 0 || tta[y][x] > nbrecur)&&nbrecur < istance) {
+                                if ((tta[y][x] == 0 || tta[y][x] > nbrecur) && nbrecur < istance) {
                                     tta[y][x] = nbrecur;
                                     if (tabEat[y][x] == "1" || tabEat[y][x] == "2") {
-   
-                                            istance = nbrecur
-                                            select = ir
+
+                                        istance = nbrecur
+                                        select = ir
 
 
                                     } else {
@@ -364,10 +366,6 @@ function draw() {
                         parcours(xx - 1, yy, "g", 1)
                         parcours(xx, yy + 1, "b", 1)
                         parcours(xx, yy - 1, "h", 1)
-                        tta[yy][xx] = "aa"
-                        for (var i = 0; i < 31; i++) {
-                            tta[i] = tta[i].join(" ")
-                        }
                         //console.log(select + " " + xx + " " + yy)
                         //console.log(tta)
 
@@ -377,8 +375,34 @@ function draw() {
                 if (PhaseChoix && nbphase < tabChoix.length) {
                     select = tabChoix[nbphase]
                 }
+                if (nbphase == tabChoix.length) {
+                    select = selectTourche;
+                    if (tabEat3.length > 1) {
+                        console.log(tabEat3)
+                        console.log(Math.round(pacman.y) +" "+Math.round(pacman.x))
+                        switch (select) {
+                            case "g":
+                                if (tabEat3[Math.round(pacman.y)][Math.round(pacman.x) - 2] ==1)
+                                    perAct += 1;
+                                break;
+                            case "d":
+                                if (tabEat3[Math.round(pacman.y)][Math.round(pacman.x) + 2] ==1)
+                                    perAct += 1;
+                                break;
+                            case "h":
+                                if (tabEat3[Math.round(pacman.y) - 2][Math.round(pacman.x)] ==1)
+                                    perAct += 1;
+                                break;
+                            case "b":
+                                if (tabEat3[Math.round(pacman.y) + 2][Math.round(pacman.x)]==1)
+                                    perAct += 1;
+                                break;
+                        }
+                    }
+                }
                 PhaseChoix = true;
                 tabArbre.push(arbre);
+
                 switch (select) {
                     case "g": gauche();
                         break;
@@ -405,6 +429,8 @@ function draw() {
                         }
                 }
                 if (nbphase == tabChoix.length) {
+
+                    perTo += 1;
                     tabChoix.push(select)
                     PhaseChoix = false
                     nbphase = 10000000
@@ -413,6 +439,7 @@ function draw() {
                 try {
                     arbre = arbre[(timeTotal / 12) + select];
                     if (!PhaseChoix) {
+                        $("#oui").html(perAct + " " + perTo + " " + perAct / perTo);
                         if (arbre.t > 0)
                             $("#dir").html($("#dir").html() + `<div  class="d-flex justify-content-around"><div class=" bg-secondary">${Math.round((arbre[((timeTotal + 12) / 12) + "h"].w / arbre[((timeTotal + 12) / 12) + "h"].t) * 100 / 100)}</div><div  class=" bg-secondary">${Math.round((arbre[((timeTotal + 12) / 12) + "b"].w / arbre[((timeTotal + 12) / 12) + "b"].t) * 100) / 100}</div><div class="bg-secondary">${Math.round((arbre[((timeTotal + 12) / 12) + "g"].w / arbre[((timeTotal + 12) / 12) + "g"].t) * 100) / 100}</div><div class="bg-secondary">${Math.round((arbre[((timeTotal + 12) / 12) + "d"].w / arbre[((timeTotal + 12) / 12) + "d"].t * 100) / 100)}</div></div>`);
                         else
@@ -595,7 +622,7 @@ function GameOver() {
             tabEat2[i][j] = "0"
         }
     }
-    
+
     mangerInky = 10000000;
     mangerpinky = 10000000;
     mangerclyde = 10000000;
@@ -606,8 +633,8 @@ function GameOver() {
     Pchoix = 10000000;
     FBleu = 10000000;
     SortiePinky = 10000000;
-    
-    
+
+
     if (!PhaseChoix) {
         tabArbre.push(arbre);
         var w = 1;
@@ -1106,7 +1133,7 @@ function bas() {
 resize();
 repositionne();
 setTimeout(() => {
-    setInterval(function () { draw(); }, 20);
+    setInterval(function () { draw(); }, 10);
 }, 1000);
 
 
