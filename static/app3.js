@@ -321,7 +321,7 @@ function draw() {
 
                 select = "";
 
-
+                var irr ="";
                 if (PhaseChoix && selectTourche != "") {
                     select = selectTourche;
                     if (nbphase > tabChoix.length - 1) {
@@ -349,6 +349,7 @@ function draw() {
 
                                         istance = nbrecur
                                         select = ir
+                                        irr = ir
 
 
                                     } else {
@@ -356,6 +357,7 @@ function draw() {
                                         parcours(x - 1, y, ir, nbrecur + 1)
                                         parcours(x, y + 1, ir, nbrecur + 1)
                                         parcours(x, y - 1, ir, nbrecur + 1)
+                                        
                                     }
 
                                 }
@@ -366,8 +368,7 @@ function draw() {
                         parcours(xx - 1, yy, "g", 1)
                         parcours(xx, yy + 1, "b", 1)
                         parcours(xx, yy - 1, "h", 1)
-                        //console.log(select + " " + xx + " " + yy)
-                        //console.log(tta)
+                        
 
 
                     }
@@ -378,23 +379,23 @@ function draw() {
                 if (nbphase == tabChoix.length) {
                     select = selectTourche;
                     if (tabEat3.length > 1) {
-                        console.log(tabEat3)
-                        console.log(Math.round(pacman.y) +" "+Math.round(pacman.x))
-                        switch (select) {
-                            case "g":
-                                if (tabEat3[Math.round(pacman.y)][Math.round(pacman.x) - 2] ==1)
+                        //console.log(select + " " + xx + " " + yy)
+                        //console.log(tabEat3)
+                        switch (pacman.direction) {
+                            case "gauche":
+                                if (irr == "g")
                                     perAct += 1;
                                 break;
-                            case "d":
-                                if (tabEat3[Math.round(pacman.y)][Math.round(pacman.x) + 2] ==1)
+                            case "droite":
+                                if (irr == "d")
                                     perAct += 1;
                                 break;
-                            case "h":
-                                if (tabEat3[Math.round(pacman.y) - 2][Math.round(pacman.x)] ==1)
+                            case "haut":
+                                if (irr == "h")
                                     perAct += 1;
                                 break;
-                            case "b":
-                                if (tabEat3[Math.round(pacman.y) + 2][Math.round(pacman.x)]==1)
+                            case "bas":
+                                if (irr == "s")
                                     perAct += 1;
                                 break;
                         }
@@ -413,23 +414,21 @@ function draw() {
                     case "b": bas();
                         break;
                     default:
-                        var t = Math.random();
-                        if (t >= 0.75) {
-                            gauche();
-                            select = "g";
-                        } else if (t >= 0.5) {
-                            droite();
-                            select = "d";
-                        } else if (t >= 0.25) {
-                            haut();
-                            select = "h";
-                        } else {
-                            bas();
-                            select = "b";
+                        switch (select) {
+                            case "g": gauche();
+                                break;
+                            case "d": droite();
+                                break;
+                            case "h": haut();
+                                break;
+                            case "b": bas();
+                                break;
+                            default:
+                                select = selectTourche;
                         }
                 }
                 if (nbphase == tabChoix.length) {
-
+                    if(nbphase>1)
                     perTo += 1;
                     tabChoix.push(select)
                     PhaseChoix = false
@@ -610,6 +609,7 @@ function drawFantomes() {
 function GameOver() {
 
     nbphase = 0;
+    if (PhaseChoix) 
     for (var i = 0; i < 31; i++) {
         tabEat3[i] = []
         for (var j = 0; j < 28; j++) {
@@ -696,7 +696,7 @@ function GameOver() {
     arbre = MCTS;
     if (!PhaseChoix) {
         tabChoix = []
-        updateMCTS();
+        //updateMCTS();
         selectTourche = ""
     }
     fantome.blinky.choix = false;
@@ -1021,65 +1021,66 @@ function drawEat() {
     }
 }
 function drawMap() {
-    for (var i = 0; i < 28; i++) {
-        for (var j = 0; j < 31; j++) {
-            switch (tab[j][i]) {
-                case '0'://vertical
-                    ctx.beginPath();
-                    ctx.rect(i * taille + taille / 4, j * taille + 8 * taille, taille / 2, taille);
-                    ctx.fillStyle = "#0002ff";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                case '1'://horizontal
-                    ctx.beginPath();
-                    ctx.rect(i * taille, j * taille + taille / 4 + 8 * taille, taille, taille / 2);
-                    ctx.fillStyle = "#0002ff";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                case '2': //angle bas-droit
-                    ctx.beginPath();
-                    ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille / 2, taille * (3 / 4));
-                    ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
-                    ctx.fillStyle = "#0002ff";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                case '3': //angle droit-haut
-                    ctx.beginPath();
-                    ctx.rect(i * taille + taille / 4, j * taille + 8 * taille, taille / 2, taille * (3 / 4));
-                    ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
-                    ctx.fillStyle = "#0002ff";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                case '4': //angle haut-gauche
-                    ctx.beginPath();
-                    ctx.rect(i * taille + taille / 4, j * taille + 8 * taille, taille / 2, taille * (3 / 4));
-                    ctx.rect(i * taille, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
-                    ctx.fillStyle = "#0002ff";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                case '5': //angle gauche-bas
-                    ctx.beginPath();
-                    ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille / 2, taille * (3 / 4));
-                    ctx.rect(i * taille, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
-                    ctx.fillStyle = "#0002ff";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
-                default:
-                    ctx.beginPath();
-                    ctx.rect(i * taille, j * taille + 8 * taille, taille, taille);
-                    ctx.fillStyle = "#000000";
-                    ctx.fill();
-                    ctx.closePath();
-                    break;
+    if (!PhaseChoix)
+        for (var i = 0; i < 28; i++) {
+            for (var j = 0; j < 31; j++) {
+                switch (tab[j][i]) {
+                    case '0'://vertical
+                        ctx.beginPath();
+                        ctx.rect(i * taille + taille / 4, j * taille + 8 * taille, taille / 2, taille);
+                        ctx.fillStyle = "#0002ff";
+                        ctx.fill();
+                        ctx.closePath();
+                        break;
+                    case '1'://horizontal
+                        ctx.beginPath();
+                        ctx.rect(i * taille, j * taille + taille / 4 + 8 * taille, taille, taille / 2);
+                        ctx.fillStyle = "#0002ff";
+                        ctx.fill();
+                        ctx.closePath();
+                        break;
+                    case '2': //angle bas-droit
+                        ctx.beginPath();
+                        ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille / 2, taille * (3 / 4));
+                        ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
+                        ctx.fillStyle = "#0002ff";
+                        ctx.fill();
+                        ctx.closePath();
+                        break;
+                    case '3': //angle droit-haut
+                        ctx.beginPath();
+                        ctx.rect(i * taille + taille / 4, j * taille + 8 * taille, taille / 2, taille * (3 / 4));
+                        ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
+                        ctx.fillStyle = "#0002ff";
+                        ctx.fill();
+                        ctx.closePath();
+                        break;
+                    case '4': //angle haut-gauche
+                        ctx.beginPath();
+                        ctx.rect(i * taille + taille / 4, j * taille + 8 * taille, taille / 2, taille * (3 / 4));
+                        ctx.rect(i * taille, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
+                        ctx.fillStyle = "#0002ff";
+                        ctx.fill();
+                        ctx.closePath();
+                        break;
+                    case '5': //angle gauche-bas
+                        ctx.beginPath();
+                        ctx.rect(i * taille + taille / 4, j * taille + taille / 4 + 8 * taille, taille / 2, taille * (3 / 4));
+                        ctx.rect(i * taille, j * taille + taille / 4 + 8 * taille, taille * (3 / 4), taille / 2);
+                        ctx.fillStyle = "#0002ff";
+                        ctx.fill();
+                        ctx.closePath();
+                        break;
+                    default:
+                        ctx.beginPath();
+                        ctx.rect(i * taille, j * taille + 8 * taille, taille, taille);
+                        ctx.fillStyle = "#000000";
+                        ctx.fill();
+                        ctx.closePath();
+                        break;
+                }
             }
         }
-    }
 }
 document.addEventListener("keydown", keyDownHandler, false);
 function keyDownHandler(e) {
