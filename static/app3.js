@@ -1140,8 +1140,6 @@ function keyDownHandler(e) {
     }
 }
 function droite() {
-
-
     if (pacman.direction == "gauche" || pacman.direction == null)
         pacman.direction = "droite";
     pacman.directionSuivante = "droite";
@@ -1181,9 +1179,15 @@ chemin selon les meilleurs coups possible, on va faire que la seul if,
 c'est que quan ça essine bha c'est pas en moe auto
 et quan ça continue c'est autp
 
+
 les inicateur 
 l'interval entre manger les pac gomme
 la istance des fantome pour savoir si on essaie de fuir et ou pas
+
+istance entre les fantome et le joueur et la super pac gomme
+
+la ifférence entre la première et ernière vie,  avec la rarerté e la vie et oncl a possibilité e mourrir
+
 
 */
 
