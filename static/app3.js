@@ -321,7 +321,7 @@ function draw() {
 
                 select = "";
 
-                var irr ="";
+                var irr = "";
                 if (PhaseChoix && selectTourche != "") {
                     select = selectTourche;
                     if (nbphase > tabChoix.length - 1) {
@@ -340,11 +340,39 @@ function draw() {
                                 tta[i][j] = "0"
                             }
                         }
-
+                        var fant = [Math.round(fantome.blinky.x), Math.round(fantome.blinky.y), Math.round(fantome.clyde.x), Math.round(fantome.clyde.y), Math.round(fantome.inky.x), Math.round(fantome.inky.y), Math.round(fantome.pinky.x), Math.round(fantome.pinky.y)];
+                        tta[fant[1]][fant[0]] = 1000;
+                        tta[fant[3]][fant[2]] = 1000;
+                        tta[fant[5]][fant[4]] = 1000;
+                        tta[fant[7]][fant[6]] = 1000;
                         function parcours(x, y, ir, nbrecur) {
                             if (tabEat[y][x] != 0) {
-                                if ((tta[y][x] == 0 || tta[y][x] > nbrecur) && nbrecur < istance) {
+                                if (FantomeBleu && ((
+                                    y == fant[1] && x == fant[0]) || (
+                                        y == fant[3] && x == fant[2]) || (
+                                        y == fant[5] && x == fant[4]) || (
+                                        y == fant[7] && x == fant[6])
+                                )) {
+                                    if (nbrecur > 10)
+                                        nbrecur -= 10;
+                                    else
+                                        nbrecur = 1;
+                                    tta[y][x] = 0;
+                                }
+                                if ((tta[y][x] == 0 || tta[y][x] > nbrecur) && nbrecur < istance && tta[y][x] != 1000) {
+
+
                                     tta[y][x] = nbrecur;
+                                    if (FantomeBleu && ((
+                                        y == fant[1] && x == fant[0]) || (
+                                            y == fant[3] && x == fant[2]) || (
+                                            y == fant[5] && x == fant[4]) || (
+                                            y == fant[7] && x == fant[6])
+                                    )) {
+                                        istance = nbrecur
+                                        select = ir
+                                        irr = ir
+                                    }
                                     if (tabEat[y][x] == "1" || tabEat[y][x] == "2") {
 
                                         istance = nbrecur
@@ -352,12 +380,12 @@ function draw() {
                                         irr = ir
 
 
-                                    } else {
+                                    } else if (nbrecur != 1000) {
                                         parcours(x + 1, y, ir, nbrecur + 1)
                                         parcours(x - 1, y, ir, nbrecur + 1)
                                         parcours(x, y + 1, ir, nbrecur + 1)
                                         parcours(x, y - 1, ir, nbrecur + 1)
-                                        
+
                                     }
 
                                 }
@@ -368,19 +396,21 @@ function draw() {
                         parcours(xx - 1, yy, "g", 1)
                         parcours(xx, yy + 1, "b", 1)
                         parcours(xx, yy - 1, "h", 1)
-                        
+
 
 
                     }
                 }
                 if (PhaseChoix && nbphase < tabChoix.length) {
                     select = tabChoix[nbphase]
+
                 }
                 if (nbphase == tabChoix.length) {
                     select = selectTourche;
+                    console.log(tta)
                     if (tabEat3.length > 1) {
-                        //console.log(select + " " + xx + " " + yy)
-                        //console.log(tabEat3)
+
+
                         switch (pacman.direction) {
                             case "gauche":
                                 if (irr == "g")
@@ -428,8 +458,9 @@ function draw() {
                         }
                 }
                 if (nbphase == tabChoix.length) {
-                    if(nbphase>1)
-                    perTo += 1;
+
+                    if (nbphase > 1)
+                        perTo += 1;
                     tabChoix.push(select)
                     PhaseChoix = false
                     nbphase = 10000000
@@ -609,13 +640,13 @@ function drawFantomes() {
 function GameOver() {
 
     nbphase = 0;
-    if (PhaseChoix) 
-    for (var i = 0; i < 31; i++) {
-        tabEat3[i] = []
-        for (var j = 0; j < 28; j++) {
-            tabEat3[i][j] = tabEat2[i][j]
+    if (PhaseChoix)
+        for (var i = 0; i < 31; i++) {
+            tabEat3[i] = []
+            for (var j = 0; j < 28; j++) {
+                tabEat3[i][j] = tabEat2[i][j]
+            }
         }
-    }
     for (var i = 0; i < 31; i++) {
         tabEat2[i] = []
         for (var j = 0; j < 28; j++) {
@@ -1134,7 +1165,7 @@ function bas() {
 resize();
 repositionne();
 setTimeout(() => {
-    setInterval(function () { draw(); }, 10);
+    setInterval(function () { draw(); }, 20);
 }, 1000);
 
 
@@ -1149,6 +1180,11 @@ en gros, on va faire que, a chaque boucle, ça continue le jeu automatique pour 
 chemin selon les meilleurs coups possible, on va faire que la seul if,
 c'est que quan ça essine bha c'est pas en moe auto
 et quan ça continue c'est autp
+
+les inicateur 
+l'interval entre manger les pac gomme
+la istance des fantome pour savoir si on essaie de fuir et ou pas
+
 */
 
 
