@@ -12,6 +12,8 @@ var pacman = {
 }
 var perTo = 0;
 var perAct = 0;
+var toRangeFantome = 0.00;
+var toRangeInterFantome = 0;
 var tta = [];
 var time = 0;
 var score = 0;
@@ -322,6 +324,7 @@ function draw() {
                 select = "";
 
                 var irr = "";
+                var fant = [Math.round(fantome.blinky.x), Math.round(fantome.blinky.y), Math.round(fantome.clyde.x), Math.round(fantome.clyde.y), Math.round(fantome.inky.x), Math.round(fantome.inky.y), Math.round(fantome.pinky.x), Math.round(fantome.pinky.y)];
                 if (PhaseChoix && selectTourche != "") {
                     select = selectTourche;
                     if (nbphase > tabChoix.length - 1) {
@@ -340,7 +343,10 @@ function draw() {
                                 tta[i][j] = "0"
                             }
                         }
-                        var fant = [Math.round(fantome.blinky.x), Math.round(fantome.blinky.y), Math.round(fantome.clyde.x), Math.round(fantome.clyde.y), Math.round(fantome.inky.x), Math.round(fantome.inky.y), Math.round(fantome.pinky.x), Math.round(fantome.pinky.y)];
+
+
+
+                        //question, istance minimum avec un fantome ou istance moyenne avec tout les fantome ? 
                         tta[fant[1]][fant[0]] = 1000;
                         tta[fant[3]][fant[2]] = 1000;
                         tta[fant[5]][fant[4]] = 1000;
@@ -360,12 +366,9 @@ function draw() {
                                     tta[y][x] = 0;
                                 }
                                 if ((tta[y][x] == 0 || tta[y][x] > nbrecur) && nbrecur < istance && tta[y][x] != 1000) {
-
-
                                     tta[y][x] = nbrecur;
-                                    if (FantomeBleu && ((
-                                        y == fant[1] && x == fant[0]) || (
-                                            y == fant[3] && x == fant[2]) || (
+                                    if (FantomeBleu && ((y == fant[1] && x == fant[0]) || (
+                                        y == fant[3] && x == fant[2]) || (
                                             y == fant[5] && x == fant[4]) || (
                                             y == fant[7] && x == fant[6])
                                     )) {
@@ -374,20 +377,15 @@ function draw() {
                                         irr = ir
                                     }
                                     if (tabEat[y][x] == "1" || tabEat[y][x] == "2") {
-
                                         istance = nbrecur
                                         select = ir
                                         irr = ir
-
-
                                     } else if (nbrecur != 1000) {
                                         parcours(x + 1, y, ir, nbrecur + 1)
                                         parcours(x - 1, y, ir, nbrecur + 1)
                                         parcours(x, y + 1, ir, nbrecur + 1)
                                         parcours(x, y - 1, ir, nbrecur + 1)
-
                                     }
-
                                 }
 
                             }
@@ -396,9 +394,6 @@ function draw() {
                         parcours(xx - 1, yy, "g", 1)
                         parcours(xx, yy + 1, "b", 1)
                         parcours(xx, yy - 1, "h", 1)
-
-
-
                     }
                 }
                 if (PhaseChoix && nbphase < tabChoix.length) {
@@ -407,7 +402,7 @@ function draw() {
                 }
                 if (nbphase == tabChoix.length) {
                     select = selectTourche;
-                    console.log(tta)
+
                     if (tabEat3.length > 1) {
 
 
@@ -458,7 +453,12 @@ function draw() {
                         }
                 }
                 if (nbphase == tabChoix.length) {
-
+                    var rangeFantome = (distance(xx, yy, fant[0], fant[1]) + distance(xx, yy, fant[2], fant[3]) + distance(xx, yy, fant[4], fant[5]) + distance(xx, yy, fant[6], fant[7])) / 4;     
+                    if(rangeFantome>0)
+                    toRangeFantome = toRangeFantome+rangeFantome
+                    
+                    var rangeInterFantome = (distance(fant[0], fant[1],fant[2], fant[3])+distance(fant[0], fant[1],fant[4], fant[5])+distance(fant[0], fant[1],fant[6], fant[7])+distance(fant[2], fant[3],fant[4], fant[5])+distance(fant[2], fant[3],fant[6], fant[7])+distance(fant[4], fant[5],fant[6], fant[7]))
+                    console.log(rangeInterFantome)
                     if (nbphase > 1)
                         perTo += 1;
                     tabChoix.push(select)
@@ -498,7 +498,11 @@ function draw() {
         draw()
     }
 }
-
+function distance(x1, y1, x2, y2) {
+    a = { x: x1, y: y1 };
+    b = { x: x2, y: y2 }
+    return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y))
+}
 function drawFruit() {
     if (!PhaseChoix) {
         ctx.beginPath();
@@ -1163,7 +1167,7 @@ function bas() {
 resize();
 repositionne();
 setTimeout(() => {
-    setInterval(function () { draw(); }, 20);
+    setInterval(function () { draw(); }, 10);
 }, 1000);
 
 
@@ -1180,7 +1184,7 @@ c'est que quan ça essine bha c'est pas en moe auto
 et quan ça continue c'est autp
 
 
-les inicateur 
+les inicateur
 l'interval entre manger les pac gomme
 la istance des fantome pour savoir si on essaie de fuir et ou pas
 
