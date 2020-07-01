@@ -134,7 +134,7 @@ function resize() {
     document.getElementById('Game').width = taille * 28;
     document.getElementById('Game').height = taille * 44;
     document.getElementById('info').style = "height:" + taille * 44 + "px; width:" + taille * 28 + "px;";
-    document.getElementById('dir').style = "height:" + taille * 34 + "px;overflow:scroll;";
+
     drawMap();
     drawinfo();
 }
@@ -251,6 +251,7 @@ for (var i = 0; i < 31; i++) {
 }
 
 function draw() {
+ 
     if (reception) {
         if (!pause) {
             if (timeTotal - FBleu == 500) {
@@ -326,6 +327,7 @@ function draw() {
                 var irr = "";
                 var fant = [Math.round(fantome.blinky.x), Math.round(fantome.blinky.y), Math.round(fantome.clyde.x), Math.round(fantome.clyde.y), Math.round(fantome.inky.x), Math.round(fantome.inky.y), Math.round(fantome.pinky.x), Math.round(fantome.pinky.y)];
                 if (PhaseChoix && selectTourche != "") {
+                    
                     select = selectTourche;
                     if (nbphase > tabChoix.length - 1) {
                         select = "";
@@ -452,13 +454,14 @@ function draw() {
                                 select = selectTourche;
                         }
                 }
+             
                 if (nbphase == tabChoix.length) {
-                    var rangeFantome = (distance(xx, yy, fant[0], fant[1]) + distance(xx, yy, fant[2], fant[3]) + distance(xx, yy, fant[4], fant[5]) + distance(xx, yy, fant[6], fant[7])) / 4;     
-                    if(rangeFantome>0)
-                    toRangeFantome = toRangeFantome+rangeFantome
+                    var rangeFantome = (distance(xx, yy, fant[0], fant[1]) + distance(xx, yy, fant[2], fant[3]) + distance(xx, yy, fant[4], fant[5]) + distance(xx, yy, fant[6], fant[7])) / 4;
+                    if (rangeFantome > 0)
+                        toRangeFantome = toRangeFantome + rangeFantome
+
+                    var rangeInterFantome = (distance(fant[0], fant[1], fant[2], fant[3]) + distance(fant[0], fant[1], fant[4], fant[5]) + distance(fant[0], fant[1], fant[6], fant[7]) + distance(fant[2], fant[3], fant[4], fant[5]) + distance(fant[2], fant[3], fant[6], fant[7]) + distance(fant[4], fant[5], fant[6], fant[7]))
                     
-                    var rangeInterFantome = (distance(fant[0], fant[1],fant[2], fant[3])+distance(fant[0], fant[1],fant[4], fant[5])+distance(fant[0], fant[1],fant[6], fant[7])+distance(fant[2], fant[3],fant[4], fant[5])+distance(fant[2], fant[3],fant[6], fant[7])+distance(fant[4], fant[5],fant[6], fant[7]))
-                    console.log(rangeInterFantome)
                     if (nbphase > 1)
                         perTo += 1;
                     tabChoix.push(select)
@@ -466,10 +469,12 @@ function draw() {
                     nbphase = 10000000
                 }
                 nbphase++;
+                var ola = tabChoix.length+200
+                
                 try {
                     arbre = arbre[(timeTotal / 12) + select];
                     if (!PhaseChoix) {
-                        $("#oui").html(perAct + " " + perTo + " " + perAct / perTo);
+                        $("#oui").html("prédiction : " + perAct + " " + perTo + " " + perAct / perTo + "\n" + "distance act interfantome : " + rangeInterFantome + "\n distance moyenne fantome : " + toRangeFantome / timeTotal * 12);
                         if (arbre.t > 0)
                             $("#dir").html($("#dir").html() + `<div  class="d-flex justify-content-around"><div class=" bg-secondary">${Math.round((arbre[((timeTotal + 12) / 12) + "h"].w / arbre[((timeTotal + 12) / 12) + "h"].t) * 100 / 100)}</div><div  class=" bg-secondary">${Math.round((arbre[((timeTotal + 12) / 12) + "b"].w / arbre[((timeTotal + 12) / 12) + "b"].t) * 100) / 100}</div><div class="bg-secondary">${Math.round((arbre[((timeTotal + 12) / 12) + "g"].w / arbre[((timeTotal + 12) / 12) + "g"].t) * 100) / 100}</div><div class="bg-secondary">${Math.round((arbre[((timeTotal + 12) / 12) + "d"].w / arbre[((timeTotal + 12) / 12) + "d"].t * 100) / 100)}</div></div>`);
                         else
@@ -478,6 +483,10 @@ function draw() {
                     }
                 } catch (error) {
                     GameOver()
+                }
+                if(tabArbre.length > ola){
+                    GameOver()
+
                 }
             }
 
@@ -642,7 +651,7 @@ function drawFantomes() {
 }
 
 function GameOver() {
-
+    
     nbphase = 0;
     if (PhaseChoix)
         for (var i = 0; i < 31; i++) {
@@ -671,6 +680,7 @@ function GameOver() {
 
 
     if (!PhaseChoix) {
+        toRangeFantome = 0
         tabArbre.push(arbre);
         var w = 1;
         $("#dir").html("");
@@ -872,8 +882,11 @@ function drawPacman() {
                 pacman.direction = pacman.directionSuivante
             break;
     }
-    if (nbphase > tabArbre.length)
+    if (nbphase > tabArbre.length){
         tabEat2[Math.round(pacman.y)][Math.round(pacman.x)] = "1"
+        
+    }
+      
     if (tabEat[Math.round(pacman.y)][Math.round(pacman.x)] == "1") {
         tabEat[Math.round(pacman.y)][Math.round(pacman.x)] = "3"
         eat(10);
