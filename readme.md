@@ -1,0 +1,1 @@
+Jeu pacman codé en javascript (canvas) afin d'entrainer une IA dessus, selon le monte carlo tree searsh
